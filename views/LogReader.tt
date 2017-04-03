@@ -42,9 +42,7 @@ section#content {font-size: 12px;}
 .xtoggle-row {display: none}
 #filter {width: 100%;}
 </style>
-
   </head>
-
   <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">

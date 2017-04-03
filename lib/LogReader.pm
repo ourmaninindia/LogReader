@@ -11,7 +11,7 @@ use Time::Local;
 
 
 our $VERSION 		 = '0.1';
-our $NGINX_ERROR_LOG = '/home/alfred/webapps/LogReader/logs/error.log'; #'/var/log/nginx/summertimegoa/error.log';
+our $NGINX_ERROR_LOG = '/var/log/nginx/';
 our $ROWS_PER_PAGE   = 15;
 
 hook after_request => sub {
@@ -20,6 +20,7 @@ hook after_request => sub {
     $ses && $ses->is_dirty && $app->session_engine->flush( session => $ses );
 };
 
+# to facilitate adding this to an existing domain
 prefix '/admin';
 
 get '/log' => sub {
@@ -161,11 +162,14 @@ sub numrows {
 
 sub read_log {
 
-	my $domain 	 		= shift // 'summertimegoa.com';
+	my $domain 	 		= shift // 'domain';
 	my $filterurl 		= shift // 'all';
 	my $pageno 			= shift // 1; 
 	
 	my $option 			= '';
+	my @array           = ();
+
+	return @array unless ($domain ne 'domain');
 
 	if 		($filterurl eq 'images') 	{ $option = " and request     like '%images%' GROUP BY request ";} 
 	elsif 	($filterurl eq 'others')	{ $option = " and request not like '%images%' GROUP BY request ";} 
@@ -199,7 +203,7 @@ sub insert_log {
 		$lastdate = $lastdate // 0;
 
 	# obtain the files handler
-    unless (open (FH, '<:encoding(UTF-8)', $NGINX_ERROR_LOG)) {
+    unless (open (FH, '<:encoding(UTF-8)', $NGINX_ERROR_LOG."/$domain/error.log")) {
     	$alert->{type} 		= 'warning';
     	$alert->{message}	= "Cannot open log file: $!";
     	return $alert;
@@ -406,11 +410,8 @@ CREATE TABLE domains (
 id integer PRIMARY KEY,
 domain text);
 
-INSERT INTO domains (domain) VALUES ('summertimegoa.com');
-INSERT INTO domains (domain) VALUES ('odyssey.co.in');
-INSERT INTO domains (domain) VALUES ('travellers-palm.com');
-INSERT INTO domains (domain) VALUES ('solita.co.in');
+INSERT INTO domains (domain) VALUES ('xyz.com');
+INSERT INTO domains (domain) VALUES ('abc.co.in');
 
 =cut
-
 1;

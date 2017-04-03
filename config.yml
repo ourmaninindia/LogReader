@@ -41,7 +41,7 @@ plugins:
  Database:
   connections:
    sqlserver:
-    dsn: 'dbi:SQLite:dbname=/home/alfred/webapps/LogReader/logs/summertime.db'
+    dsn: 'dbi:SQLite:dbname=/home/alfred/webapps/LogReader/logs/LogReader.db'
     username: ''
     password: ''
     dbi_params:
