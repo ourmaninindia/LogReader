@@ -1,0 +1,81 @@
+[% INCLUDE layouts/header.tt %]
+
+<style>
+body {background-color: #000; margin-top: 70px}
+.container {width:auto;}
+p {color: antiquewhite;}
+.list{ list-style: none;}
+li{margin: 15px 0; font-size: 19px; margin-top: 50px;}
+a, h1 {color: lightgray;}
+li a.active {color: #252830;
+cursor: default;
+background-color: #1997c6;
+border-radius: 0.25rem;
+display: block;
+padding: 7px 15px;}
+.sidebar {margin-right:20px;}
+</style>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="../">LogReader</a>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-5">
+                    
+                </div>
+                <div class="col-md-2 navbar-form navbar-right"> 
+                    <!--
+                    <button onclick="toggleSettings();" class="btn btn-info btn-md "><span class="glyphicon glyphicon-wrench"></span></button>
+                    &nbsp;&nbsp;&nbsp;
+                    -->
+                </div>
+            </div> 
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-2">
+            <div class="sidebar">
+            <ul class="list">    
+                <li><a href="../" class="active">Dashboard</a></li>
+                <li><a href="../domains">Domains</a></li>
+                <li><a href="../logs/domain/all/1">Logs</a></li>
+                <li><a href="http://getbootstrap.com/components/" target="_blank">Bootstrap</a></li>
+            </ul>
+            </div>
+            </div>
+            <div class="col-md-9">
+                <h1>Dashboard</h1>
+                <hr>
+                <div class="row">
+                [% FOREACH dom in domains -%]<div class="col-md-3"><p>[% dom.domain %]</p></div>[% END %]
+                </div>
+            </div>
+        </div>
+
+[% INCLUDE layouts/footer.tt %]    
+
+    <script type="text/javascript">
+
+    /* settings */
+    function toggleSettings() {
+        var e = document.getElementById('settings');
+        if (e.style.display === 'none' || e.style.display === '') {
+            e.style.display = 'block';
+        } else {
+            e.style.display = 'none';
+        }
+    }
+
+    </script>
+
+  </body>
+</html>
