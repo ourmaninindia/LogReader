@@ -20,22 +20,19 @@ hook after_request => sub {
     $ses && $ses->is_dirty && $app->session_engine->flush( session => $ses );
 };
 
-# to facilitate adding this to an existing domain
-prefix '/admin';
-
-get '/log' => sub {
-    redirect '/admin/log/domain/all/1';
+get '/' => sub {
+    redirect '/domain/all/1';
 };
 
-get '/log/progress' => sub {
+get '/progress' => sub {
 	return session('progress');
 };
 
-post '/log/domain' => sub {
-	redirect '/admin/log/'.params->{domain}.'/all/1';
+post '/domain' => sub {
+	redirect '/'.params->{domain}.'/all/1';
 };
 
-any [ 'get', 'post' ] => '/log/*/**' => sub { 
+any [ 'get', 'post' ] => '/*/**' => sub { 
 
 	# variables passed
 	my ( $domain, $arg ) = splat;

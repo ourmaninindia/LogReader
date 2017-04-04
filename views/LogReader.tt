@@ -7,7 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="Alfred Tuinman">
-    <link rel="icon" href="../../favicon.ico">
+    <link rel="icon" href="../favicon.ico">
 
     <title>LogReader</title>
 
@@ -16,14 +16,14 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link href="//cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/e8bddc60e73c1ec2475f827be36e1957af72e2ea/build/css/bootstrap-datetimepicker.css" rel="stylesheet">
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug 
-    <link href="../../../bootstrap/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">  -->
+    <link href="../bootstrap/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">  -->
 
     <!-- Custom styles for this template -->
     <link href="jumbotron.css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../../bootstrap/docs/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="../../../bootstrap/docs/assets/js/ie-emulation-modes-warning.js"></script>
+    <!--[if lt IE 9]><script src="../bootstrap/docs/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="../bootstrap/docs/assets/js/ie-emulation-modes-warning.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -53,7 +53,7 @@ section#content {font-size: 12px;}
                     </div>
                 </div>
                 <div class="col-md-2">
-                <form class="navbar-form" action="[% request.uri_base %]/admin/log/[% domain %]/filter" method="POST">
+                <form class="navbar-form" action="[% request.uri_base %]/[% domain %]/filter" method="POST">
                     <select name="filterurl" id="filter" class="form-control">
                         <option value="all"    [% IF filterurl=="all"    %]selected[% END %]> All    </option>
                         <option value="images" [% IF filterurl=="images" %]selected[% END %]> Images </option>
@@ -66,7 +66,7 @@ section#content {font-size: 12px;}
 
                 <div class="col-md-5">
                     <div id="navbar" class="navbar-collapse collapse">
-                        <form class="navbar-form navbar-right" method="POST" action="[% request.uri_base %]/admin/log/domain">
+                        <form class="navbar-form navbar-right" method="POST" action="[% request.uri_base %]/domain">
                             <div class="form-group">
                                 <select name="domain" id="domain" class="form-control">
                                     <option value="domain"> Select</option>
@@ -112,7 +112,7 @@ section#content {font-size: 12px;}
 
                 <div class="col-md-5">&nbsp;</div>
                 <!-- delete -->
-                <form class="clearfix" action="[% request.uri_base %]/admin/log/[% domain %]/delete" method="POST">
+                <form class="clearfix" action="[% request.uri_base %]/[% domain %]/delete" method="POST">
                 <div class="col-md-2 nopadding">
                     <div class="form-group">
                         <div class='input-group date' id='deletedate'>
@@ -167,8 +167,8 @@ section#content {font-size: 12px;}
         [% IF pageno == 1 %]
             FIRST PREV
         [% ELSE %]
-            <a href='[% request.uri_base %]/admin/log/[% domain %]/[% filterurl %]/1'>FIRST</a> 
-            <a href='[% request.uri_base %]/admin/log/[% domain %]/[% filterurl %]/[% prevpage %]'>PREV</a>
+            <a href='[% request.uri_base %]/[% domain %]/[% filterurl %]/1'>FIRST</a> 
+            <a href='[% request.uri_base %]/[% domain %]/[% filterurl %]/[% prevpage %]'>PREV</a>
         [% END %] 
     
         ( Page [% pageno %] of [% lastpage %] ) 
@@ -176,13 +176,13 @@ section#content {font-size: 12px;}
         [% IF (pageno == lastpage) %]
            NEXT LAST
         [% ELSE %]
-           <a href='[% request.uri_base %]/admin/log/[% domain %]/[% filterurl %]/[% nextpage %]'>NEXT</a>
-           <a href='[% request.uri_base %]/admin/log/[% domain %]/[% filterurl %]/[% lastpage %]'>LAST</a>
+           <a href='[% request.uri_base %]/[% domain %]/[% filterurl %]/[% nextpage %]'>NEXT</a>
+           <a href='[% request.uri_base %]/[% domain %]/[% filterurl %]/[% lastpage %]'>LAST</a>
         [% END %]
 
         </div>
 
-        <form action="[% request.uri_base %]/admin/log/[% domain %]/[% filterurl %]/[% pageno %]/fix" method="POST">
+        <form action="[% request.uri_base %]/[% domain %]/[% filterurl %]/[% pageno %]/fix" method="POST">
 
         <div class="row">
             <div class="col-md-1"><b>Date</b></div>
@@ -235,7 +235,7 @@ section#content {font-size: 12px;}
 
     <!-- Bootstrap core JavaScript -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="../../../bootstrap/assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script>window.jQuery || document.write('<script src="../bootstrap/assets/js/vendor/jquery.min.js"><\/script>')</script>
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
@@ -244,7 +244,7 @@ section#content {font-size: 12px;}
     <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
     <script src="//cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/e8bddc60e73c1ec2475f827be36e1957af72e2ea/src/js/bootstrap-datetimepicker.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../../../bootstrap/docs/assets/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="../bootstrap/docs/assets/js/ie10-viewport-bug-workaround.js"></script>
     
 
     <script type="text/javascript">
@@ -259,7 +259,7 @@ section#content {font-size: 12px;}
     function deletedata () {
         var date = $('#deletedate').val();
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', "[% request.uri_base %]/admin/log/" + domain + "/delete", true);
+        xhr.open('POST', "[% request.uri_base %]/" + domain + "/delete", true);
         xhr.send();
     }
     
@@ -278,7 +278,7 @@ section#content {font-size: 12px;}
         var sel = document.getElementById("domain");
         var domain = sel.options[sel.selectedIndex].text;
         
-        window.location.href = '[% request.uri_base %]/admin/log/' + domain + '/insert';
+        window.location.href = '[% request.uri_base %]/' + domain + '/insert';
     }
 
     /* submit filter on change */
@@ -300,7 +300,7 @@ section#content {font-size: 12px;}
     /* progress bar */
     $(document).ready(function(){
         var progresspump = setInterval(function(){
-            $.get("[% request.uri_base %]/admin/log/progress", function(data){
+            $.get("[% request.uri_base %]/progress", function(data){
                 $("#progress").css('width',data+'%');
                 $("#progress").html(data+'%');
 
