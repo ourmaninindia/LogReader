@@ -8,7 +8,7 @@ use Dancer2;
 use Dancer2::Plugin::Database;
 use POSIX qw/ceil/;
 use Time::Local;
-
+use Socket;
 
 our $VERSION 		 = '0.1';
 our $NGINX_ERROR_LOG = '/var/log/nginx/';
@@ -27,14 +27,7 @@ get '/' => sub {
 };
 
 get 'dns/:ip' => sub {
-
-	my $ip 	 = params->{ip} // 0;
-	my $host = (defined $ip ) ? gethostbyaddr($ip,4) : '';
-
-	return template dnslookup => {
-		ip 		=> $ip,
-		host 	=> $host,
-	};
+	return gethostbyaddr(inet_aton(params->{ip}),AF_INET);
 };
 
 get '/domains' => sub {

@@ -136,7 +136,7 @@
         [% END %]
 
         </div>
-
+        <div id="hostname"></div>
         <form action="[% request.uri_base %]/[% domain %]/[% filterurl %]/[% pageno %]/fix" method="POST">
 
         <div class="row">
@@ -157,7 +157,7 @@
                 <div class="col-md-1">[% line.status      %]</div>
                 <div class="col-md-1">[% line.method      %]</div>
                 <div class="col-md-4 red">[% line.request %]</div>
-                <div class="col-md-2"><a href="[% request.uri_base %]/dns/[% line.client %]" target="_blank">[% line.client %]</a></div>
+                <div class="col-md-2"><a onclick="dnslookup([% line.client %])" href="#">[% line.client %]</a></div>
                 <div class="col-md-2">[% line.host        %]</div>
                 <div class="col-md-1"><input type="checkbox" name="fix" value="[% line.id %]" [% IF line.fix %]checked[% END %]></div>
             </div>
@@ -185,6 +185,18 @@
     
 
     <script type="text/javascript">
+
+    function dnslookup(ip) { 
+        $.ajax({
+            url : '[% request.uri_base %]/dns/'+ip,
+            data:{"ip":ip},
+            type: 'GET',
+
+            success: function(data){
+                $('#hostname').html(data);
+            }
+        });
+    }
 
     /* bootstrap datepicket */
     $(function () {
