@@ -118,7 +118,8 @@
 
 <br>
 
-<div>
+<div class="row">
+    <div class="col-md-7">
     [% IF pageno == 1 %]
     FIRST PREV
     [% ELSE %]
@@ -134,15 +135,8 @@
     <a href='[% request.uri_base %]/[% domain %]/[% filterurl %]/[% nextpage %]'>NEXT</a>
     <a href='[% request.uri_base %]/[% domain %]/[% filterurl %]/[% lastpage %]'>LAST</a>
     [% END %]
-
-</div>
-<div id="hostname"></div>
-<div class="row">
-    <div class="col-md-1"></div>
-    <div class="col-md-1"></div>
-    <div class="col-md-1"></div>
-    <div class="col-md-4"></div>
-    <div class="col-md-2"><div class='red' id="hostname"></div></div>
+    </div>
+    <div class="col-md-2 red" id="hostname"></div>
     <div class="col-md-2"></div>
     <div class="col-md-1"></div>
 </div>
