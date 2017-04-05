@@ -70,6 +70,16 @@
                 </div>            
                 <br>
             </div>
+            <div class="col-md-1"></div>
+            <div class="col-md-3">
+                <div><p><b>Logfiles</b></p></div>
+                <div class="form-group">
+                    [% FOREACH dir in dirs -%]
+                    <div><p>[% dir %]</p></div>
+                    [% END %]    
+                </div>            
+                <br>
+            </div>
         </div>
 
     [% INCLUDE layouts/footer.tt %]    

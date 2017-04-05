@@ -28,9 +28,25 @@ get '/' => sub {
 
 get '/domains' => sub {
 
+	my @dirs=();
+	opendir(DIR, $NGINX_ERROR_LOG) or die "Can't opendir $NGINX_ERROR_LOG: $!";
+ 
+    while (my $sub_folders = readdir(DIR)) {
+	    next if ($sub_folders =~ /^..?$/);  # skip . and ..
+	    my $path = $NGINX_ERROR_LOG . '/' . $sub_folders;
+	    next unless (-d $path);   # skip anything that isn't a directory
+	    print "$sub_folders\n";
+	    push @dirs, $sub_folders; 
+	    debug to_dumper(@dirs);
+
+    }
+    
+    closedir(DIR);
+
 	return template domains => { 
         domains     => domains(),
         name        => params->{name},
+        dirs		=> \@dirs,
     };
 };
 
