@@ -21,7 +21,28 @@ hook after_request => sub {
 };
 
 get '/' => sub {
-    redirect '/domain/all/1';
+    return template 'dashboard' => {
+    	domains     => domains(),
+    };
+};
+
+get '/domains' => sub {
+
+	return template domains => { 
+        domains     => domains(),
+        name        => params->{name},
+    };
+};
+
+post '/domains/:option' => sub {
+
+	if (params->{option} eq 'add'){ 
+		my $ok = insert_domain(params->{name});
+	} elsif (params->{option} eq 'del'){ 
+		my $ok = delete_domain(params->{delete});
+	}
+
+	redirect '../domains',
 };
 
 get '/progress' => sub {
@@ -295,6 +316,37 @@ sub insert_log {
 	return $alert;
 }
 
+sub insert_domain {
+
+	my $domain = shift // '';
+
+	return 0 unless (length($domain) != 0 );
+
+	my $qry = qq(INSERT INTO domains (domain) VALUES (?);); 
+
+	my $sth = database('sqlserver')->prepare($qry);
+    $sth->execute("$domain") 
+    	or die "Unable to insert.";
+    $sth->finish;
+
+    return 1; 
+}
+
+sub delete_domain {
+
+	my $domain = shift // '';
+
+	return 0 unless (length($domain) != 0 );
+
+	my $qry = qq(delete from domains where domain like ?;); 
+
+	my $sth = database('sqlserver')->prepare($qry);
+    $sth->execute("$domain") 
+    	or die "Unable to delete.";
+    $sth->finish;
+
+    return 1; 
+}
 
 sub update_log {
 
