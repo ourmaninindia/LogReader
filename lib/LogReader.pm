@@ -31,7 +31,7 @@ get 'dns/:ip' => sub {
 	my $ip 	 = params->{ip} // 0;
 	my $host = (defined $ip ) ? gethostbyaddr($ip,4) : '';
 
-	template dnslookup => {
+	return template dnslookup => {
 		ip 		=> $ip,
 		host 	=> $host,
 	};
