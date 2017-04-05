@@ -26,6 +26,17 @@ get '/' => sub {
     };
 };
 
+get 'dns/:ip' => sub {
+
+	my $ip 	 = params->{ip} // 0;
+	my $host = (defined $ip ) ? gethostbyaddr($ip,4) : '';
+
+	template dnslookup => {
+		ip 		=> $ip,
+		host 	=> $host,
+	};
+};
+
 get '/domains' => sub {
 
 	my @dirs=();
@@ -477,6 +488,28 @@ domain text);
 
 INSERT INTO domains (domain) VALUES ('xyz.com');
 INSERT INTO domains (domain) VALUES ('abc.co.in');
+
+drop table bots;
+CREATE TABLE bots (
+ id integer PRIMARY KEY,
+ ua text,
+ ip text,
+ referer text,
+ date integer NOT NULL,
+ spam integer);
+
+Sort access by Response Codes
+cat access.log | cut -d '"' -f3 | cut -d ' ' -f2 | sort | uniq -c | sort -rn
+
+Broken links
+awk '($9 ~ /404/)' access.log | awk '{print $7}' | sort | uniq -c | sort -rn
+
+Most requested URLs
+awk -F\" '{print $2}' access.log | awk '{print $2}' | sort | uniq -c | sort -r
+
+Most requested URLs containing XYZ
+awk -F\" '($2 ~ "ref"){print $2}' access.log | awk '{print $2}' | sort | uniq -c | sort -r
+
 
 =cut
 1;
