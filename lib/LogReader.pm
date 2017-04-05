@@ -27,6 +27,7 @@ get '/' => sub {
 };
 
 get 'dns/:ip' => sub {
+	
 	return gethostbyaddr(inet_aton(params->{ip}),AF_INET);
 };
 
