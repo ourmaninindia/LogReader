@@ -20,6 +20,7 @@ our @EXPORT = qw{
     delete_bots
     logs
     numrows_logs
+    insert_logs
     update_logs
     delete_logs
 };
