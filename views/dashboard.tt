@@ -43,15 +43,16 @@ padding: 7px 15px;}
         <div class="row">
             <div class="col-md-1"></div>
             <div class="col-md-2">
-            <div class="sidebar">
-            <ul class="list">    
-                <li><a href="../" class="active">Dashboard</a></li>
-                <li><a href="../domains">Domains</a></li>
-                <li><a href="../logs/domain/all/1">Logs</a></li>
-                <li><a href="../bots">Bots</a></li>
-                <li><a href="http://getbootstrap.com/components/" target="_blank">Bootstrap</a></li>
-            </ul>
-            </div>
+                <div class="sidebar">
+                    <ul class="list">    
+                        <li><a href="../" class="active">Dashboard</a></li>
+                        <li><a href="../domains">Domains</a></li>
+                        <li><a href="../logs/domain/all/1">Logs</a></li>
+                        <li><a href="../bots">Bots</a></li>
+                        <li><a href="http://getbootstrap.com/components/" target="_blank">Bootstrap</a></li>
+                        <li><a href="#">[% session %]</a></li>
+                    </ul>
+                </div>
             </div>
             <div class="col-md-9">
                 <h1>Dashboard</h1>

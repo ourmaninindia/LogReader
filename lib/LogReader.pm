@@ -23,6 +23,20 @@ hook after_request => sub
     $ses && $ses->is_dirty && $app->session_engine->flush( session => $ses );
 };
 
+get '/test' => sub 
+{
+    
+ 	session progress => 'test';
+
+    my $sess = session('test');
+    template dashboard => 
+    {
+    	domains     => domains(),
+    	session 	=> $sess,
+    };
+};
+
+
 get '/' => sub 
 {
     template dashboard => 
