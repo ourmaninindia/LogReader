@@ -225,7 +225,6 @@ sub insert_logs
   my $counter       = 0;
   my $progress      = 0;
   my $progress_last = 0;
-  my $progress_file = $domain.'.prog.txt';
 
   # determine the last date entered
   my  $lastdate = database('sqlserver')->selectrow_array("SELECT max(date) as lastdate FROM error_log WHERE domain like '%$domain%';");
@@ -240,7 +239,7 @@ sub insert_logs
 
   # determine number of lines in the file
   my @lines = <FH>;
-  my $progress_total = scalar @lines;
+  my $progress_total = scalar @lines // 1;
   seek FH, 0, 0;
 
   # prepare session variables
@@ -308,7 +307,7 @@ sub insert_logs
         # $field->{four }  = $vars[4];
         # $body_bytes_sent = $vars2[0];
         
-        my $qry = qq(INSERT INTO error_log  (date,status,client,server,request,method,host,error,fix,domain) 
+        my $qry = qq(INSERT INTO error_log (date,status,client,server,request,method,host,error,fix,domain) 
                     VALUES      (?,?,?,?,?,?,?,?,0,?);); 
 
         my $sth = database('sqlserver')->prepare($qry);
