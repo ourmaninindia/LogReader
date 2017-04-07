@@ -1,0 +1,103 @@
+[% INCLUDE layouts/header.tt %]    
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="../">LogReader</a>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-5">
+                    
+                </div>
+                <div class="col-md-2 navbar-form navbar-right"> 
+                    <button onclick="toggleSettings();" class="btn btn-info btn-md "><span class="glyphicon glyphicon-wrench"></span></button>
+                    &nbsp;&nbsp;&nbsp;
+                </div>
+            </div> 
+        </div>
+    </nav>
+
+    <!-- Main jumbotron  -->
+    <div class="jumbotron">
+        <div class="container" id="settings">
+            <div class="row">&nbsp;</div>
+            <div class="row">
+                <!-- add -->
+                <div class="col-md-4">
+                <form class="navbar-form" method="POST" action="[% request.uri_base %]/bots/add">
+                    <div class="form-group">
+                        <input type="text" name="ua" class="input" placeholder="ua"><br>
+                        <input type="text" name="ip" class="input" placeholder="ip"><br>
+                        <input type="text" name="spam" class="input" placeholder="spam">
+                        <button type="submit" class="btn btn-success">Add&nbsp;&nbsp;</button>    
+                    </div>            
+                </form> 
+                </div>
+                <!-- delete -->
+                <div class="col-md-4">
+                <form class="navbar-form" method="POST" action="[% request.uri_base %]/bots/del">
+                    <div class="form-group">
+                        <select name="delete" id="domain" class="form-control">
+                            <option value="domain"> Select</option>
+                            [% FOREACH bot in bots -%]
+                            <option value="[% bot.id %]">[% bot.ip %]</option>
+                            [% END %]
+                        </select> 
+                    </div>
+                    <button type="submit" class="btn btn-danger">Delete</button>                
+                </form> 
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    [% IF alert.type == "success" %]<div class = "alert alert-success">[% alert.message %]</div>[% END %]
+    [% IF alert.type == "info"    %]<div class = "alert alert-info"   >[% alert.message %]</div>[% END %]
+    [% IF alert.type == "warning" %]<div class = "alert alert-warning">[% alert.message %]</div>[% END %]
+    [% IF alert.type == "danger"  %]<div class = "alert alert-danger" >[% alert.message %]</div>[% END %]
+    
+    <div class="container">
+        <div><h1>Bots</h1></div>
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-1"><p><b>ID</b></p></div>
+            <div class="col-md-5"><p><b>UA</b></p></div>
+            <div class="col-md-1"><p><b>IP</b></p></div>
+            <div class="col-md-1"><p><b>Referer</b></p></div>
+            <div class="col-md-1"><p><b>Date</b></p></div>
+            <div class="col-md-1"><b>Spam</b></div>
+            <div class="col-md-1"></div>
+        </div>
+        [% FOREACH bot in bots -%]  
+        <div class="row">    
+            <div class="col-md-1"></div>
+            <div class="col-md-1"><p>[% bot.id %]</p></div>
+            <div class="col-md-5"><p>[% bot.ua %]</p></div>
+            <div class="col-md-1"><p>[% bot.ip %]</p></div>
+            <div class="col-md-1"><p>[% bot.referer %]</p></div>
+            <div class="col-md-1"><p>[% bot.date %]</p></div>
+            <div class="col-md-1">[% bot.spam %]</div>
+            <div class="col-md-1"></div>
+        </div>
+        [% END %]
+
+    [% INCLUDE layouts/footer.tt %]    
+
+    <script type="text/javascript">
+
+    /* settings */
+    function toggleSettings() {
+        var e = document.getElementById('settings');
+        if (e.style.display === 'none' || e.style.display === '') {
+            e.style.display = 'block';
+        } else {
+            e.style.display = 'none';
+        }
+    }
+
+    </script>
+  </body>
+</html>

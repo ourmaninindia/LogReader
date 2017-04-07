@@ -48,6 +48,7 @@ padding: 7px 15px;}
                 <li><a href="../" class="active">Dashboard</a></li>
                 <li><a href="../domains">Domains</a></li>
                 <li><a href="../logs/domain/all/1">Logs</a></li>
+                <li><a href="../bots">Bots</a></li>
                 <li><a href="http://getbootstrap.com/components/" target="_blank">Bootstrap</a></li>
             </ul>
             </div>
