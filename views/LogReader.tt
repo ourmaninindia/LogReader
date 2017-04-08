@@ -9,20 +9,6 @@
                 </div>
             </div>
             <div class="col-md-2">
-            <div id="filt">
-                <form class="navbar-form" action="[% request.uri_base %]/[% domain %]/filter" method="POST">
-                    <button class="btn btn-md btn-primary "><span class="glyphicon glyphicon-filter"></span></button>
-                    <div class="form-group">
-                    <select name="filterurl" id="filter" class="form-control">
-                        <option value="all"    [% IF filterurl=="all"    %]selected[% END %]> All    </option>
-                        <option value="images" [% IF filterurl=="images" %]selected[% END %]> Images </option>
-                        <option value="others" [% IF filterurl=="others" %]selected[% END %]> Others </option>
-                        <option value="status" [% IF filterurl=="status" %]selected[% END %]> Status </option>
-                    </select>
-                    <noscript><input type="submit" value="Submit"></noscript>
-                    </div>
-                </form>
-            </div>
             </div>
             <div class="col-md-2">
             </div>
@@ -119,7 +105,14 @@
         &nbsp;   
     </div>
 </div>
-
+<br>
+<div>
+    <button onclick="clickFilter()" class="btn btn-md btn-primary "><span class="glyphicon glyphicon-filter"></span></button>&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" id="xImage" [% IF xImage  %]checked[% END %] value="xImage">Images&nbsp;&nbsp;&nbsp;
+    <input type="checkbox" id="xOther" [% IF xOther  %]checked[% END %] value="xOther">Other &nbsp;&nbsp;&nbsp;
+    <input type="checkbox" id="xBot"   [% IF xBot    %]checked[% END %] value="xBot">Bots &nbsp;&nbsp;&nbsp;
+    <input type="checkbox" id="xCritic"[% IF xCritic %]checked[% END %] value="xCritic">Critic &nbsp;&nbsp;&nbsp;
+</div>
 <br>
 
 <div class="row">
@@ -245,11 +238,17 @@
             window.location.href = '[% request.uri_base %]/' + domain + '/insert';
         }
 
-        /* submit filter on change of filter */
-        $('#filter').change(
-            function(){
-               $(this).closest('form').trigger('submit');
-        });
+        function clickFilter()  {
+            var sel     = document.getElementById("domain");
+            var domain  = sel.options[sel.selectedIndex].text;
+
+            var xBot    = document.getElementById("xBot"   ).checked | 0;
+            var xImage  = document.getElementById("xImage" ).checked | 0;
+            var xOther  = document.getElementById("xOther" ).checked | 0;
+            var xCritic = document.getElementById("xCritic").checked | 0;
+
+            window.location.href = '[% request.uri_base %]/' + domain + '/' + xImage + xOther + xBot + xCritic + '/1';
+        }
 
         /* hide the rows with the error data */
         function toggleRow() {

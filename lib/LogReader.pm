@@ -33,7 +33,10 @@ get '/' => sub
 
 get 'dns/:ip' => sub 
 {
-	return gethostbyaddr(inet_aton(params->{ip}),AF_INET);
+	my $host = gethostbyaddr(inet_aton(params->{ip}),AF_INET);
+	my $bot  = index $host,'robot'; 
+	insert_bots($host) unless index($host,'robot') == -1;
+	return $host;
 };
 
 get '/domains' => sub 
@@ -146,6 +149,9 @@ any [ 'get', 'post' ] => '/*/**' => sub
 
 	if ($domain ne 'domain')
 	{
+		debug $domain;
+		debug $pageno;
+		
 		# domain has been selected, determine number of rows and pages
 	    $rows	  = numrows_logs($domain,$filterurl);
 	    $lastpage = ceil($rows->{numrows}/$ROWS_PER_PAGE);
