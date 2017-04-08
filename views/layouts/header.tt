@@ -32,7 +32,6 @@
 .odd  {background-color: lightgray;}
 section#content {font-size: 12px;}
 .alert { color: black;}
-#settings {display: none;} 
 .jumbotron { padding-bottom: 15px; padding-top: 40px; margin-bottom: 0}
 .nopadding { padding-left: 0; padding-right: 0;}
 .xtoggle-row {display: none}

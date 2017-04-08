@@ -41,9 +41,9 @@
 
             <ul>
                 <li>Location: <span class="filepath">/home/alfred/webapps/LogReader</span></li>
-                <li>Template engine: <span class="app-info"><% settings.template %></span></li>
+                <li>Template engine: <span class="app-info">[% settings.template %]</span></li>
                 <li>Logger: <span class="app-info"><% settings.logger %></span></li>
-                <li>Environment: <span class="app-info"><% settings.environment %></span></li>
+                <li>Environment: <span class="app-info">{{ settings.environment }}</span></li>
             </ul>
 
           </li>

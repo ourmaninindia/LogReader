@@ -1,16 +1,18 @@
 [% INCLUDE layouts/header.tt %]
+
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="row">
-
             <div class="col-md-3">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="[% request.uri_base %]/">LogReader</a>
                 </div>
             </div>
-
             <div class="col-md-2">
+            <div id="filt">
                 <form class="navbar-form" action="[% request.uri_base %]/[% domain %]/filter" method="POST">
+                    <button class="btn btn-md btn-primary "><span class="glyphicon glyphicon-filter"></span></button>
+                    <div class="form-group">
                     <select name="filterurl" id="filter" class="form-control">
                         <option value="all"    [% IF filterurl=="all"    %]selected[% END %]> All    </option>
                         <option value="images" [% IF filterurl=="images" %]selected[% END %]> Images </option>
@@ -18,13 +20,15 @@
                         <option value="status" [% IF filterurl=="status" %]selected[% END %]> Status </option>
                     </select>
                     <noscript><input type="submit" value="Submit"></noscript>
+                    </div>
                 </form>
             </div>
-
+            </div>
             <div class="col-md-2">
+            </div>
+            <div class="col-md-3">
                 <div id="navbar" class="navbar-collapse collapse">
-                <form class="navbar-form navbar-right" method="POST" action="[% request.uri_base %]/domain">
-                    
+                    <form class="navbar-form navbar-right" method="POST" action="[% request.uri_base %]/domain">                    
                         <div class="form-group">
                             <select name="domain" id="domain" class="form-control">
                                 <option value="domain">Select</option>
@@ -34,10 +38,9 @@
                             </select> 
                         </div>
                         <button type="submit" class="btn btn-success" onclick="DomainSelected();">Select</button>                
-                        </form>
+                    </form>
                 </div>
             </div>
-
             <div class="col-md-2 navbar-form navbar-right" id="settings"> 
                 <button onclick="toggleRow();" class="btn btn-info btn-md "><span class="glyphicon glyphicon-resize-vertical"></span></button>
                 &nbsp;   
@@ -50,7 +53,7 @@
 
 <!-- Main jumbotron  -->
 <div class="jumbotron">
-    <div class="container" id="settings">
+    <div class="container" id="jumbo">
         <div class="row">&nbsp;</div>
         <div class="row">
             <!-- import -->
@@ -223,9 +226,10 @@
             xhr.send();
         }
 
-        /* settings */
+        /* hide jumbo section */
         function toggleSettings() {
-            var e = document.getElementById('settings');
+            var e = document.getElementById('jumbo');
+            alert(e.style.display);
             if (e.style.display === 'none' || e.style.display === '') {
                 e.style.display = 'block';
             } else {
@@ -245,7 +249,7 @@
         $('#filter').change(
             function(){
                $(this).closest('form').trigger('submit');
-           });
+        });
 
         /* hide the rows with the error data */
         function toggleRow() {
@@ -272,14 +276,21 @@
                 })
             }, 1000);
 
-            /* hide settings div */
-            var dom = document.getElementById("domain");
-            var settings = document.getElementById("settings");
-            var domain = dom.options[dom.selectedIndex].text;
-            settings.style.display = 'block';
+            /* hide setting buttons div */
+            var d = document.getElementById("domain");
+            var s = document.getElementById("settings");
+            var f = document.getElementById("filt");
+            var domain = d.options[d.selectedIndex].text;
+            s.style.visible = 'visible';
             if (domain == 'Select'){
-                settings.style.display = 'none';
+                s.style.visibility = 'hidden';
+                f.style.visibility = 'hidden';               
+            } else {
+                s.style.visibility = 'visible';
             };
+            /* hide jumbotron */
+            var e = document.getElementById('jumbo');
+            e.style.display = 'none';
         });
 
         </script>

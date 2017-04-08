@@ -2,41 +2,26 @@
 # env-related settings should go to environments/$env.yml
 # all the settings in this file will be loaded at Dancer's startup.
 
-# Your application's name
 appname: "LogReader"
 behind_proxy: 1
-
-# The default layout to use for your application (located in
-# views/layouts/main.tt)
 layout: "main"
-
-# when the charset is set to UTF-8 Dancer will handle for you
-# all the magic of encoding and decoding. You should not care
-# about unicode within your app when this setting is set (recommended).
 charset: "UTF-8"
-
-# template engine
-# simple: default and very basic template engine
-# template_toolkit: TT
 session: "YAML"
-#      cookie_domain: ".domain.com"
-#session: "Simple"
 # session_dir: /tmp
-
 template: "template_toolkit"
 engines:
-   template:
-      template_toolkit:
-         start_tag: '[%'
-         end_tag:   '%]'
-         
+  template:
+    template_toolkit:
+      start_tag: '<%'
+      end_tag:   '%>'
+#         
 logger: 'File'
 engines:
    logger:
       File:
          log_dir: "/home/alfred/webapps/LogReader/logs"
          file_name: "deployment.log"
-
+#
 plugins:
  Database:
   connections:
