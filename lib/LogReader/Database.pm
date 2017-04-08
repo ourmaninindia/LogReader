@@ -5,15 +5,14 @@ use warnings;
 
 use Dancer2;
 use Dancer2::Plugin::Database;
-use Data::Dumper;
-use DateTime;
 
+use Data::Dumper;
 use Exporter qw{import};
 
 our @EXPORT = qw{
     domains 
-    insert_domain
-    delete_domain
+    insert_domains
+    delete_domains
     bots
     get_id_bots
     insert_bots
@@ -233,7 +232,7 @@ sub insert_logs
   # obtain the files handler
   unless (open (FH, '<:encoding(UTF-8)', $LogReader::NGINX_ERROR_LOG."/$domain/error.log")) {
     $alert->{type}    = 'warning';
-    $alert->{message} = "Cannot open log file: $!";
+    $alert->{message} = "Cannot open log file ".$LogReader::NGINX_ERROR_LOG."/$domain/error.log: $!";
     return $alert;
   }
 
@@ -244,7 +243,7 @@ sub insert_logs
 
   # prepare session variables
   my $application = app();
-  my $session     = session();
+  my $my_session  = LogReader::session();
 
   # start the work
   while (my $line = <FH>) 
@@ -256,19 +255,20 @@ sub insert_logs
       my @vars2 = split /,/, $vars[5];
 
       # determine the date of this entry
-      my $thisdate = get_epoch( $vars[0], $vars[1] ); 
+      my $thisdate = LogReader::get_epoch( $vars[0], $vars[1] ); 
       # not all logs have a date
       $thisdate = time() unless $thisdate;
       # only enter new data
       next if ($thisdate < $lastdate);
 
       # update the progress session to monitor the progress
-      if (($counter%100) == 0) {
-        session 'progress' => (int($counter / $progress_total * 100) ) ;
-        $application->session_engine->flush( session => $session );
+      if (($counter%100) == 0) 
+      {
+        LogReader::session 'progress' => (int($counter / $progress_total * 100) ) ;
+        $application->session_engine->flush( session => $my_session );
       }
 
-      my $date      = get_epoch( $vars[0], $vars[1] );
+      my $date      = LogReader::get_epoch( $vars[0], $vars[1] );
 
       my $status    = $vars[2] // '';
          $status    =~ s/[\[\]]//g;
@@ -311,14 +311,14 @@ sub insert_logs
                     VALUES      (?,?,?,?,?,?,?,?,0,?);); 
 
         my $sth = database('sqlserver')->prepare($qry);
-          $sth->execute("$date","$status","$client","$server","$request","$method","$host","$error","$domain") 
-            or die "Unable to insert.";
-          $sth->finish;
+           $sth->execute("$date","$status","$client","$server","$request","$method","$host","$error","$domain") 
+              or die "Unable to insert.";
+           $sth->finish;
   };
   close FH;
 
-  session 'progress' => 100 ;
-  $application->session_engine->flush( session => $session );
+  LogReader::session 'progress' => 100 ;
+  $application->session_engine->flush( session => $my_session );
 
   $alert->{type}    = 'success';
   $alert->{message} = 'Log data inserted into the database';
@@ -387,23 +387,17 @@ sub update_logs
 
 sub delete_logs 
 {    
-    my $alert;
-    my $date;
+    my  $domain = shift // 'domain';
+    my  $date   = shift // '01-01-1970';
+    my  $alert;
 
-    if (params->{deletedate})
-    {
-      $date = get_epoch_from_eu(params->{deletedate});
-      
-      my $qry = 'DELETE FROM error_log where date < ?';
-
-      my $sth = database('sqlserver')->prepare($qry);
-      $sth->execute($date) or $alert->message="Unable to delete. ";
-      $sth->finish;
-    }
+    my  $qry = 'DELETE FROM error_log where domain like ? and date < ?';
+    my  $sth = database('sqlserver')->prepare($qry);
+        $sth->execute($domain,$date) or $alert->message="Unable to delete. ";
+        $sth->finish;
     
-
     $alert->{type}    = 'success';
-    $alert->{message} = 'Log data up to '.params->{deletedate}. ' has been deleted from the database';
+    $alert->{message} = "Log data up to $date has been deleted from the database.";
 
     return $alert;
 }

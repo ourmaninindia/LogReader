@@ -26,13 +26,15 @@ hook after_request => sub
 get '/test' => sub 
 {
     
- 	session progress => 'test';
+ 	session progress2 => 'test';
 
-    my $sess = session('test');
+    my $sess = session('progress2');
+
+    debug to_dumper($sess);
     template dashboard => 
     {
     	domains     => domains(),
-    	session 	=> $sess,
+    	sess 	=> $sess,
     };
 };
 
@@ -148,8 +150,9 @@ any [ 'get', 'post' ] => '/*/**' => sub
 
 	if ($filterurl eq 'delete')
 	{
-		$alert = delete_logs($domain,params->{deletedate});
-		$pageno = 1;
+		my $date 	= get_epoch_from_eu(params->{deletedate});
+		$alert 		= delete_logs( $domain, $date );
+		$pageno 	= 1;
 	};
 
 	if ($fix)
@@ -189,15 +192,6 @@ any [ 'get', 'post' ] => '/*/**' => sub
 
 
 # ------------- routines ----------------
-
-sub euro_date{
-	
-	my $date = shift // '';
-	my ($yyyy,$mm,$dd) = split /\//,$date;
-
-	return "$dd/$mm/$yyyy";
-}
-
 
 sub get_epoch {
 	

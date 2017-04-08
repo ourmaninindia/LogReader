@@ -2,11 +2,13 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="row">
+
             <div class="col-md-3">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="[% request.uri_base %]/">LogReader</a>
                 </div>
             </div>
+
             <div class="col-md-2">
                 <form class="navbar-form" action="[% request.uri_base %]/[% domain %]/filter" method="POST">
                     <select name="filterurl" id="filter" class="form-control">
@@ -19,25 +21,24 @@
                 </form>
             </div>
 
-            <div class="col-md-5">
+            <div class="col-md-2">
                 <div id="navbar" class="navbar-collapse collapse">
-                    <form class="navbar-form navbar-right" method="POST" action="[% request.uri_base %]/domain">
+                <form class="navbar-form navbar-right" method="POST" action="[% request.uri_base %]/domain">
+                    
                         <div class="form-group">
                             <select name="domain" id="domain" class="form-control">
-                                <option value="domain"> Select</option>
+                                <option value="domain">Select</option>
                                 [% FOREACH dom in domains -%]
                                 <option value="[% dom.domain %]" [% IF dom.domain == domain %] selected[% END %]>[% dom.domain %]</option>
                                 [% END %]
                             </select> 
                         </div>
-                        <div class="form-group">
-                            <!-- <input type="password" placeholder="Password" class="form-control"> -->
-                        </div>
-                        <button type="submit" class="btn btn-success">Select</button>                
-                    </form> 
+                        <button type="submit" class="btn btn-success" onclick="DomainSelected();">Select</button>                
+                        </form>
                 </div>
             </div>
-            <div class="col-md-2 navbar-form navbar-right"> 
+
+            <div class="col-md-2 navbar-form navbar-right" id="settings"> 
                 <button onclick="toggleRow();" class="btn btn-info btn-md "><span class="glyphicon glyphicon-resize-vertical"></span></button>
                 &nbsp;   
                 <button onclick="toggleSettings();" class="btn btn-info btn-md "><span class="glyphicon glyphicon-wrench"></span></button>
@@ -184,98 +185,103 @@
     </div>
 
 </form>
-[% INCLUDE layouts/footer.tt %]     
+        [% INCLUDE layouts/footer.tt %]     
 
+        <script type="text/javascript">
 
+        function dnslookup(data) {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE ) {
+                    if (xhr.status == 200) {
+                        document.getElementById("hostname").innerHTML = xhr.responseText;
+                    }
+                    /* else if (xhr.status == 400) {
+                        alert('There was an error 400');
+                    }
+                    else {
+                        alert('something else other than 200 was returned');
+                    } */
+                }
+            };
 
-<script type="text/javascript">
-
-function dnslookup(data) {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == XMLHttpRequest.DONE ) {
-            if (xhr.status == 200) {
-                document.getElementById("hostname").innerHTML = xhr.responseText;
-            }
-            /* else if (xhr.status == 400) {
-                alert('There was an error 400');
-            }
-            else {
-                alert('something else other than 200 was returned');
-            } */
+            xhr.open("GET", "[% request.uri_base %]/dns/"+data, true);
+            xhr.send();
         }
-    };
 
-    xhr.open("GET", "[% request.uri_base %]/dns/"+data, true);
-    xhr.send();
-}
+        /* bootstrap datepicket */
+        $(function () {
+            $('#deletedate').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+        });
 
-/* bootstrap datepicket */
-$(function () {
-    $('#deletedate').datetimepicker({
-        format: 'DD/MM/YYYY'
-    });
-});
+        function deletedata () {
+            var date = $('#deletedate').val();
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', "[% request.uri_base %]/" + domain + "/delete", true);
+            xhr.send();
+        }
 
-function deletedata () {
-    var date = $('#deletedate').val();
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', "[% request.uri_base %]/" + domain + "/delete", true);
-    xhr.send();
-}
-
-/* settings */
-function toggleSettings() {
-    var e = document.getElementById('settings');
-    if (e.style.display === 'none' || e.style.display === '') {
-        e.style.display = 'block';
-    } else {
-        e.style.display = 'none';
-    }
-}
-
-/* import data */
-function importData()     {    
-    var sel = document.getElementById("domain");
-    var domain = sel.options[sel.selectedIndex].text;
-
-    window.location.href = '[% request.uri_base %]/' + domain + '/insert';
-}
-
-/* submit filter on change */
-$('#filter').change(
-    function(){
-       $(this).closest('form').trigger('submit');
-   });
-
-/* hide the rows with the error data */
-function toggleRow() {
-    var els = document.getElementsByClassName('toggle-row');
-    for(var i=0; i<els.length; ++i){
-        var s = els[i].style;
-        s.display = s.display==='none' ? 'block' : 'none';
-    };
-}
-toggleRow('toggle-row');
-
-/* progress bar */
-$(document).ready(function(){
-    var progresspump = setInterval(function(){
-        $.get("[% request.uri_base %]/progress", function(data){
-            $("#progress").css('width',data+'%');
-            $("#progress").html(data+'%');
-
-            if(data > 99) {
-                clearInterval(progresspump);
-                $("#progressouter").removeClass("active");
-                $("#progress").html("Done");
+        /* settings */
+        function toggleSettings() {
+            var e = document.getElementById('settings');
+            if (e.style.display === 'none' || e.style.display === '') {
+                e.style.display = 'block';
+            } else {
+                e.style.display = 'none';
             }
-        })
-    }, 1000);
-});
+        }
 
+        /* import data */
+        function importData() {    
+            var sel = document.getElementById("domain");
+            var domain = sel.options[sel.selectedIndex].text;
 
-</script>
+            window.location.href = '[% request.uri_base %]/' + domain + '/insert';
+        }
 
-</body>
+        /* submit filter on change of filter */
+        $('#filter').change(
+            function(){
+               $(this).closest('form').trigger('submit');
+           });
+
+        /* hide the rows with the error data */
+        function toggleRow() {
+            var els = document.getElementsByClassName('toggle-row');
+            for(var i=0; i<els.length; ++i){
+                var s = els[i].style;
+                s.display = s.display==='none' ? 'block' : 'none';
+            };
+        }
+        toggleRow('toggle-row');
+
+        /* progress bar */
+        $(document).ready(function(){
+            var progresspump = setInterval(function(){
+                $.get("[% request.uri_base %]/progress", function(data){
+                    $("#progress").css('width',data+'%');
+                    $("#progress").html(data+'%');
+
+                    if(data > 99) {
+                        clearInterval(progresspump);
+                        $("#progressouter").removeClass("active");
+                        $("#progress").html("Done");
+                    }
+                })
+            }, 1000);
+
+            /* hide settings div */
+            var dom = document.getElementById("domain");
+            var settings = document.getElementById("settings");
+            var domain = dom.options[dom.selectedIndex].text;
+            settings.style.display = 'block';
+            if (domain == 'Select'){
+                settings.style.display = 'none';
+            };
+        });
+
+        </script>
+    </body>
 </html>
