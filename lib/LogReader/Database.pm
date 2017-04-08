@@ -264,7 +264,7 @@ sub insert_logs
       # update the progress session to monitor the progress
       if (($counter%100) == 0) 
       {
-        LogReader::session 'progress' => (int($counter / $progress_total * 100) ) ;
+        LogReader::session( 'progress' => (int($counter / $progress_total * 100)) ) ;
         $application->session_engine->flush( session => $my_session );
       }
 
@@ -317,7 +317,7 @@ sub insert_logs
   };
   close FH;
 
-  LogReader::session 'progress' => 100 ;
+  LogReader::session( 'progress' => 100 );
   $application->session_engine->flush( session => $my_session );
 
   $alert->{type}    = 'success';
