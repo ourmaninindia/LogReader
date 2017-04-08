@@ -179,12 +179,12 @@ sub logs
   { 
     $option .= " and request like '%images%' ";
   } 
-  if (index($filterurl,1,1) ) 
-  { 
+  else
+  {
     $option .= " and request not like '%images%' ";
   } 
   
-  if (index($filterurl,1,2) )  
+  if (index($filterurl,1,1) )  
   { 
     $option .= " and spam = 1"; 
   } 
@@ -193,11 +193,14 @@ sub logs
     $option .= " and spam = 0";
   } 
 
-  if (index($filterurl,1,3) )  
+  if (index($filterurl,1,2) )  
   { 
     $option .= " and status like 'crit' "; 
+  }
+  else
+  {
+    $option .= " and status like 'error' "; 
   } 
-   
 
   my $qry  = "SELECT strftime('%d-%m-%Y',date(e.date,'unixepoch')) as eudate, * FROM error_log e LEFT JOIN bots on e.client = bots.ip WHERE domain like '$domain' and fix=0 $option ORDER BY e.date DESC LIMIT " .($pageno - 1) * $LogReader::ROWS_PER_PAGE .','. $LogReader::ROWS_PER_PAGE;
 debug $qry;

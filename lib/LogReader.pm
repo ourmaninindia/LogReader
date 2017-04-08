@@ -178,9 +178,8 @@ any [ 'get', 'post' ] => '/*/**' => sub
         domains     => @fqdn,
         domain      => $domain,
         xImage  	=> index($filterurl,1,0),
-        xOther      => index($filterurl,1,1),
-        xBot        => index($filterurl,1,2),
-        xCritic     => index($filterurl,1,3),	
+        xBot        => index($filterurl,1,1),
+        xCritic     => index($filterurl,1,2),	
     };
 };
 

@@ -244,10 +244,9 @@
 
             var xBot    = document.getElementById("xBot"   ).checked | 0;
             var xImage  = document.getElementById("xImage" ).checked | 0;
-            var xOther  = document.getElementById("xOther" ).checked | 0;
             var xCritic = document.getElementById("xCritic").checked | 0;
 
-            window.location.href = '[% request.uri_base %]/' + domain + '/' + xImage + xOther + xBot + xCritic + '/1';
+            window.location.href = '[% request.uri_base %]/' + domain + '/' + xImage + xBot + xCritic + '/1';
         }
 
         /* hide the rows with the error data */
