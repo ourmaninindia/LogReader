@@ -151,7 +151,7 @@ any [ 'get', 'post' ] => '/*/**' => sub
 	{
 		debug $domain;
 		debug $pageno;
-		
+
 		# domain has been selected, determine number of rows and pages
 	    $rows	  = numrows_logs($domain,$filterurl);
 	    $lastpage = ceil($rows->{numrows}/$ROWS_PER_PAGE);
@@ -177,6 +177,10 @@ any [ 'get', 'post' ] => '/*/**' => sub
         alert 	 	=> $alert,
         domains     => @fqdn,
         domain      => $domain,
+        xImage  	=> index($filterurl,1,0),
+        xOther      => index($filterurl,1,1),
+        xBot        => index($filterurl,1,2),
+        xCritic     => index($filterurl,1,3),	
     };
 };
 

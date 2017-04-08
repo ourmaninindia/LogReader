@@ -195,14 +195,11 @@ sub logs
 
   if (index($filterurl,1,3) )  
   { 
-    $option .= " and status like 'Critic' "; 
+    $option .= " and status like 'crit' "; 
   } 
    
 
-  my $qry  = "SELECT strftime('%d-%m-%Y',date(e.date,'unixepoch')) as eudate, * 
-          FROM error_log e LEFT JOIN bots on e.client = bots.ip WHERE domain like '$domain' and fix=0 $option 
-          ORDER BY e.date DESC 
-          LIMIT " .($pageno - 1) * $LogReader::ROWS_PER_PAGE .','. $LogReader::ROWS_PER_PAGE;
+  my $qry  = "SELECT strftime('%d-%m-%Y',date(e.date,'unixepoch')) as eudate, * FROM error_log e LEFT JOIN bots on e.client = bots.ip WHERE domain like '$domain' and fix=0 $option ORDER BY e.date DESC LIMIT " .($pageno - 1) * $LogReader::ROWS_PER_PAGE .','. $LogReader::ROWS_PER_PAGE;
 debug $qry;
     return database('sqlserver')->selectall_arrayref( $qry, { Slice => {} } );
 }
