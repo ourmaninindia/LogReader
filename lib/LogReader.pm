@@ -116,6 +116,11 @@ any [ 'get', 'post' ] => '/*/**' => sub
    	my $pageno 		= @{$arg}[1] // 0;
 	my $fix    		= @{$arg}[2] // 0;
 	
+debug to_dumper($domain);
+debug to_dumper($filterurl);
+debug to_dumper($pageno);
+debug to_dumper($fix);
+
    	# declarations
 	my $lastpage    = 1;
 	my @data 		= ();
@@ -159,13 +164,17 @@ any [ 'get', 'post' ] => '/*/**' => sub
 		# determine page number
 		if ($pageno  > $lastpage) { $pageno = $lastpage;} 
 		if ($pageno  < 1) 		  { $pageno = 1;} 
-
+debug $filterurl;
 	    @data = logs($domain,$filterurl,$pageno);
 	}
 
 	my @fqdn = domains();
 
-    template LogReader => 
+debug substr($filterurl,0,1);
+debug substr($filterurl,1,1);
+debug substr($filterurl,2,1);
+
+    return template LogReader => 
     { 
     	pageno   	=> $pageno,
     	prevpage 	=> ($pageno == 1) ? 1 : ($pageno - 1),
@@ -177,9 +186,9 @@ any [ 'get', 'post' ] => '/*/**' => sub
         alert 	 	=> $alert,
         domains     => @fqdn,
         domain      => $domain,
-        xImage  	=> index($filterurl,1,0),
-        xBot        => index($filterurl,1,1),
-        xCritic     => index($filterurl,1,2),	
+        xImage  	=> substr($filterurl,0,1),
+        xBot        => substr($filterurl,1,1),
+        xCritic     => substr($filterurl,2,1),	
     };
 };
 

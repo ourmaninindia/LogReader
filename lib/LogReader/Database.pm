@@ -175,7 +175,9 @@ sub logs
 
   return @array unless ($domain ne 'domain');
 
-  if (index($filterurl,1,0) )  
+debug $filterurl;
+
+  if (substr($filterurl,0,1) == 1)  
   { 
     $option .= " and request like '%images%' ";
   } 
@@ -184,7 +186,7 @@ sub logs
     $option .= " and request not like '%images%' ";
   } 
   
-  if (index($filterurl,1,1) )  
+  if (substr($filterurl,1,1)==1)  
   { 
     $option .= " and spam = 1"; 
   } 
@@ -193,7 +195,7 @@ sub logs
     $option .= " and spam = 0";
   } 
 
-  if (index($filterurl,1,2) )  
+  if (substr($filterurl,2,1)==1)  
   { 
     $option .= " and status like 'crit' "; 
   }
