@@ -92,7 +92,7 @@ sub get_id_bots
 
 sub insert_bots 
 {
-    my ($ua, $ip, $referer, $spam) = @_ ;
+    my ($ua, $ip, $spam) = @_ ;
 
     if ( defined get_id_bots($ip) ) 
     {
@@ -105,8 +105,8 @@ sub insert_bots
     {
         if (length $ip > 0) {
             # insert
-            my $sth = database('sqlserver')->prepare(q/INSERT INTO bots (ua,ip,referer,date,spam) VALUES (?,?,?,?,?);/);
-               $sth->execute( $ua,$ip,$referer,time(),$spam );
+            my $sth = database('sqlserver')->prepare(q/INSERT INTO bots (ua,ip,date,spam) VALUES (?,?,?,?,?);/);
+               $sth->execute( $ua,$ip,time(),$spam );
                $sth->finish;
         }
     }
@@ -174,7 +174,7 @@ sub logs
   my @array       = ();
 
   return @array unless ($domain ne 'domain');
-
+  # filter on images
   if (substr($filterurl,0,1) == 1)  
   { 
     $option .= " and request like '%images%' ";
@@ -183,12 +183,12 @@ sub logs
   {
     $option .= " and request not like '%images%' ";
   } 
-  
+  # filer on bots
   if (substr($filterurl,1,1)==1)  
   { 
-    $option .= " and spam = 1"; 
+    $option .= " and bots.ip is null"; 
   } 
- 
+  # filter on status
   if (substr($filterurl,2,1)==1)  
   { 
     $option .= " and status like 'crit' "; 

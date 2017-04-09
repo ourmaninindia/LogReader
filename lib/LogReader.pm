@@ -182,9 +182,9 @@ any [ 'get', 'post' ] => '/*/**' => sub
         alert 	 	=> $alert,
         domains     => @fqdn,
         domain      => $domain,
-        xImage  	=> substr($filterurl,0,1),
-        xBot        => substr($filterurl,1,1),
-        xCritic     => substr($filterurl,2,1),	
+        xImage  	=> substr($filterurl,0,1) // 0,
+        xBot        => substr($filterurl,1,1) // 0,
+        xCritic     => substr($filterurl,2,1) // 0,	
     };
 };
 
