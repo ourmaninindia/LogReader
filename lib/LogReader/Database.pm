@@ -175,13 +175,11 @@ sub logs
 
   return @array unless ($domain ne 'domain');
 
-debug $filterurl;
-
   if (substr($filterurl,0,1) == 1)  
   { 
     $option .= " and request like '%images%' ";
   } 
-  else
+  elsif (substr($filterurl,0,1) == 2) 
   {
     $option .= " and request not like '%images%' ";
   } 
@@ -190,23 +188,15 @@ debug $filterurl;
   { 
     $option .= " and spam = 1"; 
   } 
-  else
-  {
-    $option .= " and spam = 0";
-  } 
-
+ 
   if (substr($filterurl,2,1)==1)  
   { 
     $option .= " and status like 'crit' "; 
   }
-  else
-  {
-    $option .= " and status like 'error' "; 
-  } 
-
+ 
   my $qry  = "SELECT strftime('%d-%m-%Y',date(e.date,'unixepoch')) as eudate, * FROM error_log e LEFT JOIN bots on e.client = bots.ip WHERE domain like '$domain' and fix=0 $option ORDER BY e.date DESC LIMIT " .($pageno - 1) * $LogReader::ROWS_PER_PAGE .','. $LogReader::ROWS_PER_PAGE;
-debug $qry;
-    return database('sqlserver')->selectall_arrayref( $qry, { Slice => {} } );
+
+  return database('sqlserver')->selectall_arrayref( $qry, { Slice => {} } );
 }
 
 sub numrows_logs 

@@ -76,6 +76,13 @@ post '/domains/:option' => sub
 	redirect '../domains',
 };
 
+post '/bot/:ip' => sub
+{
+	my $host = gethostbyaddr(inet_aton(params->{ip}),AF_INET); 
+	insert_bots($host,params->{ip});
+};
+
+
 get '/bots' => sub 
 {
 	my @bots = bots();
@@ -116,11 +123,6 @@ any [ 'get', 'post' ] => '/*/**' => sub
    	my $pageno 		= @{$arg}[1] // 0;
 	my $fix    		= @{$arg}[2] // 0;
 	
-debug to_dumper($domain);
-debug to_dumper($filterurl);
-debug to_dumper($pageno);
-debug to_dumper($fix);
-
    	# declarations
 	my $lastpage    = 1;
 	my @data 		= ();
@@ -154,9 +156,6 @@ debug to_dumper($fix);
 
 	if ($domain ne 'domain')
 	{
-		debug $domain;
-		debug $pageno;
-
 		# domain has been selected, determine number of rows and pages
 	    $rows	  = numrows_logs($domain,$filterurl);
 	    $lastpage = ceil($rows->{numrows}/$ROWS_PER_PAGE);
@@ -164,17 +163,13 @@ debug to_dumper($fix);
 		# determine page number
 		if ($pageno  > $lastpage) { $pageno = $lastpage;} 
 		if ($pageno  < 1) 		  { $pageno = 1;} 
-debug $filterurl;
+
 	    @data = logs($domain,$filterurl,$pageno);
 	}
 
 	my @fqdn = domains();
 
-debug substr($filterurl,0,1);
-debug substr($filterurl,1,1);
-debug substr($filterurl,2,1);
-
-    return template LogReader => 
+    template LogReader => 
     { 
     	pageno   	=> $pageno,
     	prevpage 	=> ($pageno == 1) ? 1 : ($pageno - 1),
