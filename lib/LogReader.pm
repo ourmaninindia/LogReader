@@ -33,10 +33,10 @@ get '/' => sub
 
 get 'dns/:ip' => sub 
 {
-	my $host = gethostbyaddr(inet_aton(params->{ip}),AF_INET);
-	my $bot  = index $host,'robot'; 
-	insert_bots($host) unless index($host,'robot') == -1;
-	return $host;
+	my $host = gethostbyaddr(inet_aton(params->{ip}),AF_INET); 
+debug  index($host,'bot');	
+insert_bots($host,params->{ip}) unless index($host,'bot') == -1;
+        return $host;
 };
 
 get '/domains' => sub 
