@@ -167,7 +167,7 @@ sub delete_domains
 sub logs 
 {
   my $domain      = shift // 'domain';
-  my $filterurl   = shift // 'all';
+  my $filterurl   = shift // '000';
   my $pageno      = shift // 1; 
   
   my $option      = '';
@@ -194,7 +194,7 @@ sub logs
     $option .= " and status like 'crit' "; 
   }
  
-  my $qry  = "SELECT strftime('%d-%m-%Y',date(e.date,'unixepoch')) as eudate, * FROM error_log e LEFT JOIN bots on e.client = bots.ip WHERE domain like '$domain' and fix=0 $option ORDER BY e.date DESC LIMIT " .($pageno - 1) * $LogReader::ROWS_PER_PAGE .','. $LogReader::ROWS_PER_PAGE;
+  my $qry  = "SELECT strftime('%d-%m-%Y',date(e.date,'unixepoch')) as eudate, e.id as theid, * FROM error_log e LEFT JOIN bots on e.client = bots.ip WHERE domain like '$domain' and fix=0 $option ORDER BY e.date DESC LIMIT " .($pageno - 1) * $LogReader::ROWS_PER_PAGE .','. $LogReader::ROWS_PER_PAGE;
 
   return database('sqlserver')->selectall_arrayref( $qry, { Slice => {} } );
 }
@@ -340,58 +340,35 @@ sub insert_logs
 
 sub update_logs 
 {
-  my $domain  = shift // 0;
-  my @ids     = shift;
-
-  my $error   = 0;
-  my $alert;
-  my $i       = 0;
-  
-  my $qry = q/UPDATE error_log SET fix = 1 WHERE domain = ? and request = (SELECT request FROM error_log WHERE domain = ? and id = ?)/;
-  my $sth = database('sqlserver')->prepare($qry);
-    
-  if ( ref($ids[0]) ne 'ARRAY')
-  {
-    eval 
-    {
-      $sth->execute($domain,$domain,@ids) 
-        or die "Unable to update. id: @ids";
-    };
-
-    if($@) 
-    { 
-      $error = 1;
-    }
-
-    $sth->finish;
-    }
-    else 
-    {
-    while ($ids[0][$i] > 0 ) 
-    {
-      my $key = $ids[0][$i];
+    my @ids     = shift;
+debug to_dumper(@ids);
+    my $error   = 0;
+    my $alert;
+    my $i       = 0;
       
-      eval 
-      {
-        $sth->execute($domain,$domain,$key) 
-          or die "Unable to update. id: $key";
-      };
+    my $qry = q/UPDATE error_log SET fix = 1 WHERE id = ?/;
+    my $sth = database('sqlserver')->prepare($qry);
+        
+    if ( ref($ids[0]) ne 'ARRAY') {
+        eval { $sth->execute(@ids) or die "Unable to update. id: @ids";};
 
-      if($@) 
-      { 
-        $error = 1;
-      }
+        $error = 1 unless ($@);
+        $sth->finish;
+    }
+    else {
+        while ($ids[0][$i] > 0 ) 
+        {
+            eval { $sth->execute($ids[0][$i]) or die 'Unable to update. id: '.$ids[0][$i]; };
 
-      $sth->finish;
+            $error = 1 unless ($@);
+            $sth->finish;
+            $i += 1;
+        } 
+    }
 
-      $i += 1;
-    } 
-  }
-
-    if ($error) 
-    {
-      $alert->{type}    = 'warning';
-      $alert->{message} = "Unable to update an entry ";
+    if ($error){
+        $alert->{type}    = 'warning';
+        $alert->{message} = "Unable to update an entry ";
     }    
 
     return $alert;

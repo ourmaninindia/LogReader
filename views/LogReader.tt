@@ -163,12 +163,12 @@
             <div class="col-md-4 red">[% line.request %]</div>
             <div class="col-md-2"><a onclick="dnslookup('[% line.client %]')" href="#">[% line.client %]</a></div>
             <div class="col-md-2">[% line.host        %]</div>
-            <div class="col-md-1"><input type="checkbox" name="fix" value="[% line.id %]" [% IF line.fix %]checked[% END %]></div>
+            <div class="col-md-1"><input type="checkbox" name="fix" value="[% line.theid %]" [% IF line.fix %]checked[% END %]></div>
         </div>
         <div class="row toggle-row">
             <div class="col-md-1"> </div>
             <div class="col-md-1">
-                id=[% line.id %]
+                id=[% line.theid %]
             </div>
             <div class="col-md-10">
                 [% line.error %]

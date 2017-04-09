@@ -112,14 +112,14 @@ get '/progress' => sub
 
 post '/domain' => sub 
 {
-	redirect '/'.params->{domain}.'/all/1';
+	redirect '/'.params->{domain}.'/000all/1';
 };
 
 any [ 'get', 'post' ] => '/*/**' => sub 
 { 
 	# variables passed
 	my ( $domain, $arg ) = splat;
-	my $filterurl 	= @{$arg}[0] // 'all';
+	my $filterurl 	= @{$arg}[0] // '000';
    	my $pageno 		= @{$arg}[1] // 0;
 	my $fix    		= @{$arg}[2] // 0;
 	
@@ -151,7 +151,7 @@ any [ 'get', 'post' ] => '/*/**' => sub
 
 	if ($fix)
 	{
-		$alert = update_logs($domain,params->{fix} );
+		$alert = update_logs(params->{fix} );
 	};
 
 	if ($domain ne 'domain')
@@ -165,6 +165,7 @@ any [ 'get', 'post' ] => '/*/**' => sub
 		if ($pageno  < 1) 		  { $pageno = 1;} 
 
 	    @data = logs($domain,$filterurl,$pageno);
+	    debug to_dumper(@data);
 	}
 
 	my @fqdn = domains();
