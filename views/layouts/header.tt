@@ -27,16 +27,20 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 <style>
-.container {width:auto;}
+.container {width:auto;margin-bottom: 80px}
+.right {text-align: right;}
 .red {color: red;}
 .odd  {background-color: lightgray;}
 section#content {font-size: 12px;}
 .alert { color: black;}
 .jumbotron { padding-bottom: 15px; padding-top: 40px; margin-bottom: 0}
+#jumbo{display: none;}
 .nopadding { padding-left: 0; padding-right: 0;}
 .xtoggle-row {display: none}
 #filter {width: 100%;}
+.navbar-right{margin-right: 15px;}
 p.copyright{color: lightgray; margin-top:10px; margin-left: 10px;}
+
 </style>
   </head>
   <body>

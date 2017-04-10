@@ -1,6 +1,6 @@
 [% INCLUDE layouts/header.tt %]    
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
+    <div class="container">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="row">
                 <div class="col-md-3">
                     <div class="navbar-header">
@@ -17,31 +17,31 @@
                     &nbsp;&nbsp;&nbsp;
                 </div>
             </div> 
-        </div>
-    </nav>
+        </nav>
 
     <!-- Main jumbotron  -->
     <div class="jumbotron">
-        <div class="container" id="settings">
+        <div id="settings">
             <div class="row">&nbsp;</div>
             <div class="row">
                 <!-- add -->
                 <div class="col-md-4">
-                <form class="navbar-form" method="POST" action="[% request.uri_base %]/domains/add">
+                <form class="navbar-form" method="POST" action="[% request.uri_base %]/logs/add">
                     <div class="form-group">
-                        <input type="text" name="name" class="input">
+                        <input type="text" name="name" placeholder="Name" class="input">
+                        <input type="text" name="url" placeholder="URL" class="input">
                         <button type="submit" class="btn btn-success">Add&nbsp;&nbsp;</button>    
                     </div>            
                 </form> 
                 </div>
                 <!-- delete -->
                 <div class="col-md-4">
-                <form class="navbar-form" method="POST" action="[% request.uri_base %]/domains/del">
+                <form class="navbar-form" method="POST" action="[% request.uri_base %]/logs/del">
                     <div class="form-group">
-                        <select name="delete" id="domain" class="form-control">
-                            <option value="domain"> Select</option>
-                            [% FOREACH dom in domains -%]
-                            <option value="[% dom.id %]">[% dom.domain %]</option>
+                        <select name="delete" id="log" class="form-control">
+                            <option value="log"> Select</option>
+                            [% FOREACH log in logs -%]
+                            <option value="[% log.id_logs %]">[% log.log %]</option>
                             [% END %]
                         </select> 
                     </div>
@@ -58,30 +58,41 @@
     [% IF alert.type == "warning" %]<div class = "alert alert-warning">[% alert.message %]</div>[% END %]
     [% IF alert.type == "danger"  %]<div class = "alert alert-danger" >[% alert.message %]</div>[% END %]
     
-    <div class="container">
+    
         <div><br></div>
         <div class="row">
-            <div class="col-md-4 col-md-offset-4">
-                <div><p><b>Domain Names</b></p></div>
-                <div class="form-group">
-                    [% FOREACH dom in domains -%]
-                    <div><p>[% dom.domain %]</p></div>
-                    [% END %]    
-                </div>            
-                <br>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-2 col-md-offset-1">
+                        <div><p><b>Log Name</b></p></div>
+                    </div>
+                    <div class="col-md-2 col-md-offset-1">
+                        <div><p><b>URL</b></p></div>
+                    </div>
+                </div>
+                [% FOREACH log in logs -%]         
+                <div class="row">    
+                    <div class="col-md-2 col-md-offset-1">
+                        <div class="form-group">
+                            <p>[% log.log %]</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-md-offset-1">
+                        <p>[% log.url %]</p>            
+                    </div>
+                </div>
+                [% END %]
             </div>
-            <div class="col-md-1"></div>
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <div><p><b>Logfiles</b></p></div>
                 <div class="form-group">
                     [% FOREACH dir in dirs -%]
-                    <div><p>[% dir %]</p></div>
+                    <p>[% dir %]</p>
                     [% END %]    
                 </div>            
-                <br>
             </div>
         </div>
-
+    </div>
     [% INCLUDE layouts/footer.tt %]    
 
     <script type="text/javascript">

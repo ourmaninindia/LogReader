@@ -1,23 +1,22 @@
 [% INCLUDE layouts/header.tt %]
 
 <style>
-body {background-color: #000; margin-top: 70px}
-.container {width:auto;}
-p {color: antiquewhite;}
-.list{ list-style: none;}
-li{margin: 15px 0; font-size: 19px; margin-top: 50px;}
-a, h1 {color: lightgray;}
-li a.active {color: #252830;
-cursor: default;
-background-color: #1997c6;
-border-radius: 0.25rem;
-display: block;
-padding: 7px 15px;}
-.sidebar {margin-right:20px;}
+    body {background-color: #000; margin-top: 70px}
+    .container {width:auto;}
+    p {color: antiquewhite;}
+    .list{ list-style: none;}
+    li{margin: 15px 0; font-size: 19px; margin-top: 50px;}
+    a, h1 {color: lightgray;}
+    li a.active {color: #252830;
+    cursor: default;
+    background-color: #1997c6;
+    border-radius: 0.25rem;
+    display: block;
+    padding: 7px 15px;}
+    .sidebar {margin-right:20px;}
 </style>
-
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
+    <div class="container">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="row">
                 <div class="col-md-3">
                     <div class="navbar-header">
@@ -36,10 +35,8 @@ padding: 7px 15px;}
                     -->
                 </div>
             </div> 
-        </div>
-    </nav>
+        </nav>
 
-    <div class="container">
         <div class="row">
             <div class="col-md-1"></div>
             <div class="col-md-2">
@@ -47,8 +44,9 @@ padding: 7px 15px;}
                     <ul class="list">    
                         <li><a href="../" class="active">Dashboard</a></li>
                         <li><a href="../domains">Domains</a></li>
-                        <li><a href="../logs/domain/all/1">Logs</a></li>
+                        <li><a href="../domain/000">Error Logs</a></li>
                         <li><a href="../bots">Bots</a></li>
+                         <li><a href="../logs">Logs</a></li>
                         <li><a href="http://getbootstrap.com/components/" target="_blank">Bootstrap</a></li>
                         <li><a href="#">[% sess %]</a></li>
                     </ul>
@@ -62,8 +60,8 @@ padding: 7px 15px;}
                 </div>
             </div>
         </div>
-
-[% INCLUDE layouts/footer.tt %]    
+    </div>
+    [% INCLUDE layouts/footer.tt %]    
 
     <script type="text/javascript">
 
@@ -78,6 +76,5 @@ padding: 7px 15px;}
     }
 
     </script>
-
-  </body>
+</body>
 </html>

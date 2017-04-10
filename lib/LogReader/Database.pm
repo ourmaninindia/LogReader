@@ -13,15 +13,18 @@ our @EXPORT = qw{
     domains 
     insert_domains
     delete_domains
+    logs 
+    insert_logs
+    delete_logs
     bots
     get_id_bots
     insert_bots
     delete_bots
-    logs
-    numrows_logs
-    insert_logs
-    update_logs
-    delete_logs
+    errorlogs
+    numrows_errorlogs
+    insert_errorlogs
+    update_errorlogs
+    delete_errorlogs
 };
 
 our $VERSION = '0.1';
@@ -40,25 +43,30 @@ CREATE TABLE error_log (
  method text,
  host text,
  error text,
- fix integer,
  domain integer);
+
+drop table logs;
+CREATE TABLE logs (
+id_logs integer PRIMARY KEY,
+log text,
+url text);
 
 drop table domains;
 CREATE TABLE domains (
 id integer PRIMARY KEY,
-domain text);
+domain text,
+url text);
 
-INSERT INTO domains (domain) VALUES ('odyssey.co.in');
-INSERT INTO domains (domain) VALUES ('abc.co.in');
+ALTER TABLE domains ADD COLUMN url text;
 
 drop table bots;
 CREATE TABLE bots (
  id integer PRIMARY KEY,
  ua text,
  ip text,
- referer text,
- date integer NOT NULL,
+ datum integer NOT NULL,
  spam integer);
+
 
 Sort access by Response Codes
 cat access.log | cut -d '"' -f3 | cut -d ' ' -f2 | sort | uniq -c | sort -rn
@@ -97,7 +105,7 @@ sub insert_bots
     if ( defined get_id_bots($ip) ) 
     {
         # update
-        my $sth = database('sqlserver')->prepare(q/UPDATE bots SET date = ?, spam = ? /);
+        my $sth = database('sqlserver')->prepare(q/UPDATE bots SET datum = ?, spam = ? /);
            $sth->execute( time(), $spam ) or die "Cannot update bots with ip=$ip";
            $sth->finish;
     }
@@ -105,7 +113,7 @@ sub insert_bots
     {
         if (length $ip > 0) {
             # insert
-            my $sth = database('sqlserver')->prepare(q/INSERT INTO bots (ua,ip,date,spam) VALUES (?,?,?,?,?);/);
+            my $sth = database('sqlserver')->prepare(q/INSERT INTO bots (ua,ip,datum,spam) VALUES (?,?,?,?);/);
                $sth->execute( $ua,$ip,time(),$spam );
                $sth->finish;
         }
@@ -115,15 +123,14 @@ sub insert_bots
 
 sub delete_bots 
 {
-  my $id = shift // 0;
+    my $id = shift // 0;
 
-  return 0 unless ($id > 0 );
+    return 0 unless ($id > 0 );
 
-  my $sth = database('sqlserver')->prepare(q/delete from bots where id = ?;/);
-     $sth->execute($id) 
-        or die "Unable to delete.";
+    my $sth = database('sqlserver')->prepare(q/DELETE FROM bots WHERE id = ?;/);
+    $sth->execute($id) or die "Unable to delete.";
     $sth->finish;
-  return 1; 
+    return 1; 
 }
 
 sub domains 
@@ -140,8 +147,7 @@ sub insert_domains
   my $qry = qq(INSERT INTO domains (domain) VALUES (?);); 
 
   my $sth = database('sqlserver')->prepare($qry);
-    $sth->execute("$domain") 
-      or die "Unable to insert.";
+    $sth->execute("$domain") or die "Unable to insert.";
     $sth->finish;
 
   return 1; 
@@ -153,18 +159,52 @@ sub delete_domains
 
   return 0 unless (length($domain) != 0 );
 
-  my $qry = qq(delete from domains where domain like ?;); 
+  my $qry = q/DELETE FROM domains WHERE id = ?;/; 
 
   my $sth = database('sqlserver')->prepare($qry);
-    $sth->execute("$domain") 
-      or die "Unable to delete.";
+    $sth->execute("$domain") or die "Unable to delete.";
     $sth->finish;
 
     return 1; 
 }
 
-
 sub logs 
+{
+    return database('sqlserver')->selectall_arrayref( "SELECT * FROM logs ORDER BY log", { Slice => {} } );
+}
+
+sub insert_logs 
+{
+  my $log = shift // '';
+  my $url = shift // '';
+
+  return 0 unless (length($log) != 0 );
+
+  my $qry = q/INSERT INTO logs (log,url) VALUES (?,?);/; 
+
+  my $sth = database('sqlserver')->prepare($qry);
+    $sth->execute("$log","$url") or die "Unable to insert.";
+    $sth->finish;
+
+  return 1; 
+}
+
+sub delete_logs 
+{
+    my $log = shift // '';
+
+    return 0 unless (length($log) != 0 );
+
+    my $qry = q/DELETE FROM logs WHERE id_logs = ?;/; 
+
+    my $sth = database('sqlserver')->prepare($qry);
+    $sth->execute("$log") or die "Unable to delete.";
+    $sth->finish;
+
+    return 1; 
+}
+
+sub errorlogs 
 {
   my $domain      = shift // 'domain';
   my $filterurl   = shift // '000';
@@ -173,57 +213,89 @@ sub logs
   my $option      = '';
   my @array       = ();
 
-  return @array unless ($domain ne 'domain');
-  # filter on images
-  if (substr($filterurl,0,1) == 1)  
-  { 
-    $option .= " and request like '%images%' ";
-  } 
-  elsif (substr($filterurl,0,1) == 2) 
-  {
-    $option .= " and request not like '%images%' ";
-  } 
-  # filer on bots
-  if (substr($filterurl,1,1)==1)  
-  { 
-    $option .= " and bots.ip is null"; 
-  } 
-  # filter on status
-  if (substr($filterurl,2,1)==1)  
-  { 
-    $option .= " and status like 'crit' "; 
-  }
+    return @array unless ($domain ne 'domain');
+    # filter on images
+    if (substr($filterurl,0,1) == 1) { 
+        $option .= " and request like '%images%' ";
+    } 
+    elsif (substr($filterurl,0,1) == 2) {
+        $option .= " and request not like '%images%' ";
+    } 
+
+    # filer on bots
+    if (substr($filterurl,1,1)==1) { 
+        $option .= " and bots.ip is null"; 
+    }
+    elsif (substr($filterurl,1,1)==2){
+        $option .= " and bots.ip is not null"; 
+    }
+  
+    # filter on status
+    if (substr($filterurl,2,1)==1){ 
+        $option .= " and status like 'error' "; 
+    }
+    elsif (substr($filterurl,2,1)==2){ 
+        $option .= " and status like 'crit' "; 
+    }
  
-  my $qry  = "SELECT strftime('%d-%m-%Y',date(e.date,'unixepoch')) as eudate, e.id as theid, * FROM error_log e LEFT JOIN bots on e.client = bots.ip WHERE domain like '$domain' and fix=0 $option ORDER BY e.date DESC LIMIT " .($pageno - 1) * $LogReader::ROWS_PER_PAGE .','. $LogReader::ROWS_PER_PAGE;
+    my $qry  = "SELECT count(*) as cnt, strftime('%d-%m-%Y',date(e.date,'unixepoch')) as eudate, e.id as theid, * 
+                    FROM error_log e LEFT JOIN bots on e.client = bots.ip 
+                    WHERE domain like '$domain' $option 
+                    GROUP BY request 
+                    ORDER BY e.date DESC LIMIT " .($pageno - 1) * $LogReader::ROWS_PER_PAGE .','. $LogReader::ROWS_PER_PAGE;
 
-  return database('sqlserver')->selectall_arrayref( $qry, { Slice => {} } );
+    return database('sqlserver')->selectall_arrayref( $qry, { Slice => {} } );
 }
 
-sub numrows_logs 
+sub numrows_errorlogs 
 {
-  my $domain      = shift // 'domain';
-  my $filterurl   = shift // 'all';
+    my $domain      = shift // 'domain';
+    my $filterurl   = shift // '000';
+    my $option      = '';
+    
+    debug $domain;
+    debug $filterurl;
+    return 0 unless ($domain ne 'domain');
 
-  return 0 unless ($domain ne 'domain');
+    # filter on images
+    if (substr($filterurl,0,1) == 1) { 
+        $option .= " and request like '%images%' ";
+    } 
+    elsif (substr($filterurl,0,1) == 2) {
+        $option .= " and request not like '%images%' ";
+    } 
 
-  my  $qry  = "SELECT count(*) as numrows, 
-              strftime('%d-%m-%Y',date(min(date),'unixepoch')) as firstdate, 
-              strftime('%d-%m-%Y',date(max(date),'unixepoch')) as lastdate 
-              FROM  error_log where domain = ? and fix=0 ";
+    # filer on bots
+    if (substr($filterurl,1,1)==1) { 
+        $option .= " and bots.ip is null"; 
+    }
+    elsif (substr($filterurl,1,1)==2){
+        $option .= " and bots.ip is not null"; 
+    }
+  
+    # filter on status
+    if (substr($filterurl,2,1)==1){ 
+        $option .= " and status like 'error' "; 
+    }
+    elsif (substr($filterurl,2,1)==2){ 
+        $option .= " and status like 'crit' "; 
+    }
+ 
+    my  $qry  = "SELECT count(*) as numrows, 
+              strftime('%d-%m-%Y',date(min(e.date),'unixepoch')) as firstdate, 
+              strftime('%d-%m-%Y',date(max(e.date),'unixepoch')) as lastdate  
+                    FROM error_log e LEFT JOIN bots on e.client = bots.ip 
+                    WHERE domain like ? $option";
 
-  if      ($filterurl eq 'images')  { $qry .= " and request like '%images%' GROUP BY request like '%images%'"; } 
-  elsif   ($filterurl eq 'others')  { $qry .= " and request not like '%images%' GROUP BY request not like '%images%'";  } 
-  elsif   ($filterurl eq 'status')  { $qry .= " GROUP BY status ";  }
+    my $sth = database('sqlserver')->prepare($qry);
+    $sth->execute($domain);
+    my $row = $sth->fetchrow_hashref('NAME_lc');
+    $sth->finish;
 
-  my $sth = database('sqlserver')->prepare($qry);
-     $sth->execute($domain);
-  my $row = $sth->fetchrow_hashref('NAME_lc');
-     $sth->finish;
-
-  return $row;
+    return $row;
 }
 
-sub insert_logs 
+sub insert_errorlogs 
 {
   # variable passed
   my $domain = shift // 0;
@@ -338,43 +410,46 @@ sub insert_logs
   return $alert;
 }
 
-sub update_logs 
+sub update_errorlogs 
 {
     my @ids     = shift;
-debug to_dumper(@ids);
+    my $domain  = shift;
     my $error   = 0;
     my $alert;
     my $i       = 0;
       
-    my $qry = q/UPDATE error_log SET fix = 1 WHERE id = ?/;
+    my $qry = q/DELETE FROM error_log WHERE domain like ? and request = (SELECT request FROM error_log WHERE domain like ? and id = ?)/;
     my $sth = database('sqlserver')->prepare($qry);
         
     if ( ref($ids[0]) ne 'ARRAY') {
-        eval { $sth->execute(@ids) or die "Unable to update. id: @ids";};
+        eval { $sth->execute($domain,$domain,@ids) or die "Unable to update. id: @ids";};
 
-        $error = 1 unless ($@);
+        if($@) { 
+            $error = 1;
+        }
         $sth->finish;
     }
     else {
         while ($ids[0][$i] > 0 ) 
         {
-            eval { $sth->execute($ids[0][$i]) or die 'Unable to update. id: '.$ids[0][$i]; };
+            eval { $sth->execute($domain,$domain,$ids[0][$i]) or die 'Unable to update. id: '.$ids[0][$i]; };
 
-            $error = 1 unless ($@);
+            if($@) { 
+                $error = 1;
+            }
             $sth->finish;
             $i += 1;
         } 
     }
-
     if ($error){
         $alert->{type}    = 'warning';
-        $alert->{message} = "Unable to update an entry ";
+        $alert->{message} = "Unable to update an entry: $qry";
     }    
 
     return $alert;
 }
 
-sub delete_logs 
+sub delete_errorlogs 
 {    
     my  $domain = shift // 'domain';
     my  $date   = shift // '01-01-1970';

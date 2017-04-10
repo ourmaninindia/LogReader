@@ -1,17 +1,13 @@
 [% INCLUDE layouts/header.tt %]
-
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
+<div class="container">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="row">
             <div class="col-md-3">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="[% request.uri_base %]/">LogReader</a>
                 </div>
             </div>
-            <div class="col-md-2">
-            </div>
-            <div class="col-md-2">
-            </div>
+            <div class="col-md-3">&nbsp;</div>
             <div class="col-md-3">
                 <div id="navbar" class="navbar-collapse collapse">
                     <form class="navbar-form navbar-right" method="POST" action="[% request.uri_base %]/domain">                    
@@ -27,19 +23,19 @@
                     </form>
                 </div>
             </div>
-            <div class="col-md-2 navbar-form navbar-right" id="settings"> 
+             <div class="col-md-1">&nbsp;</div>
+            <div class="col-md-1 navbar-form" id="toggle"> 
                 <button onclick="toggleRow();" class="btn btn-info btn-md "><span class="glyphicon glyphicon-resize-vertical"></span></button>
-                &nbsp;   
+            </div>
+            <div class="col-md-1 navbar-form  navbar-right" id="settings">         
                 <button onclick="toggleSettings();" class="btn btn-info btn-md "><span class="glyphicon glyphicon-wrench"></span></button>
-                &nbsp;&nbsp;&nbsp;
             </div>
         </div> 
-    </div>
-</nav>
+    </nav>
 
 <!-- Main jumbotron  -->
 <div class="jumbotron">
-    <div class="container" id="jumbo">
+    <div id="jumbo">
         <div class="row">&nbsp;</div>
         <div class="row">
             <!-- import -->
@@ -82,9 +78,8 @@
 [% IF alert.type == "info"    %]<div class = "alert alert-info"   >[% alert.message %]</div>[% END %]
 [% IF alert.type == "warning" %]<div class = "alert alert-warning">[% alert.message %]</div>[% END %]
 [% IF alert.type == "danger"  %]<div class = "alert alert-danger" >[% alert.message %]</div>[% END %]
-<div class="container">
-  <!-- data columns -->
-  <div class="row">
+<!-- data columns -->
+<div class="row">
     <!-- first date -->
     <div class="col-md-1">
         <b>First date</b> <br>[% records.firstdate %]
@@ -107,17 +102,22 @@
 </div>
 <br>
 <div>
-    <button onclick="clickFilter()" class="btn btn-md btn-primary "><span class="glyphicon glyphicon-filter"></span></button>&nbsp;&nbsp;&nbsp;
-    <span style="border:1px solid red; padding:5px">
-    <input type="radio" name="imageS" value="1" [% IF xImage == 1 %]checked[% END %]> Images&nbsp;&nbsp;&nbsp;
-    <input type="radio" name="imageS" value="2" [% IF xImage == 2 %]checked[% END %]> Others&nbsp;&nbsp;&nbsp;
-    <input type="radio" name="imageS" value="0" [% IF xImage == 0 %]checked[% END %]> All&nbsp;&nbsp;&nbsp;
+    <button onclick="clearFilter()" class="btn btn-md btn-primary "><span class="glyphicon glyphicon-off"></span></button>&nbsp;&nbsp;&nbsp;
+    <span style="border:1px solid blue; padding: 4px 5px 7px 5px;">
+        <input type="radio" name="radioImage" value="1"[% IF xImage == 1 %] checked[% END %]> Images&nbsp;&nbsp;&nbsp;
+        <input type="radio" name="radioImage" value="2"[% IF xImage == 2 %] checked[% END %]> Others&nbsp;&nbsp;&nbsp;
     </span>&nbsp;&nbsp;&nbsp;
-    <input type="checkbox" id="xBot"   [% IF xBot    %]checked[% END %] value="xBot"> Bots &nbsp;&nbsp;&nbsp;
-    <input type="checkbox" id="xCritic"[% IF xCritic %]checked[% END %] value="xCritic"> Critic &nbsp;&nbsp;&nbsp;
+    <span style="border:1px solid blue; padding: 4px 5px 7px 5px;">
+        <input type="radio" name="radioBot" value="1"[% IF xBot == 1 %] checked[% END %]> No Bots &nbsp;&nbsp;&nbsp;
+        <input type="radio" name="radioBot" value="2"[% IF xBot == 2 %] checked[% END %]> Bots &nbsp;&nbsp;&nbsp;
+    </span>&nbsp;&nbsp;&nbsp;
+    <span style="border:1px solid blue; padding: 4px 5px 7px 5px;">
+        <input type="radio" name="radioCritic" value="1"[% IF xCritic == 1 %] checked[% END %]> Error &nbsp;&nbsp;&nbsp;
+        <input type="radio" name="radioCritic" value="2"[% IF xCritic == 2 %] checked[% END %]> Critic &nbsp;&nbsp;&nbsp;
+    </span>&nbsp;&nbsp;&nbsp;
+    <button onclick="clickFilter()" class="btn btn-md btn-primary "><span class="glyphicon glyphicon-filter"></span></button>
 </div>
 <br>
-
 <div class="row">
     <div class="col-md-7">
     [% IF pageno == 1 %]
@@ -150,7 +150,16 @@
         <div class="col-md-4"><b>Request</b></div>
         <div class="col-md-2"><b>Client</b></div>
         <div class="col-md-2"><b>Host</b></div>
-        <div class="col-md-1"><b>Fixed</b></div>
+        <div class="col-md-1">
+            <div class="row">
+                <div class="col-md-6">
+                    Total
+                </div>
+                <div class="col-md-6">
+                    Delete
+                </div>
+            </div>
+        </div>
     </div>
 
     [% FOREACH line IN data -%]
@@ -163,14 +172,22 @@
             <div class="col-md-4 red">[% line.request %]</div>
             <div class="col-md-2"><a onclick="dnslookup('[% line.client %]')" href="#">[% line.client %]</a></div>
             <div class="col-md-2">[% line.host        %]</div>
-            <div class="col-md-1"><input type="checkbox" name="fix" value="[% line.theid %]" [% IF line.fix %]checked[% END %]></div>
+            <div class="col-md-1">
+                <div class="row">
+                    <div class="col-md-6">
+                        [% line.cnt %]
+                    </div>
+                    <div class="col-md-6">
+                        <input type="checkbox" name="fix" value="[% line.theid %]" [% IF line.fix %]checked[% END %]>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="row toggle-row">
-            <div class="col-md-1"> </div>
             <div class="col-md-1">
                 id=[% line.theid %]
             </div>
-            <div class="col-md-10">
+            <div class="col-md-11">
                 [% line.error %]
             </div>
         </div>
@@ -180,10 +197,11 @@
 
     <div class="row">
         <div class="col-md-11">&nbsp;</div>
-        <div class="col-md-1"><button type="submit" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-search"></span> Remove fixes</button></div>
+        <div class="col-md-1 right"><button type="submit" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-warning"></span>Delete</button></div>
     </div>
 
 </form>
+</div>
         [% INCLUDE layouts/footer.tt %]     
 
         <script type="text/javascript">
@@ -225,7 +243,7 @@
         /* hide jumbo section */
         function toggleSettings() {
             var e = document.getElementById('jumbo');
-            alert(e.style.display);
+
             if (e.style.display === 'none' || e.style.display === '') {
                 e.style.display = 'block';
             } else {
@@ -244,18 +262,39 @@
         function clickFilter()  {
             var sel     = document.getElementById("domain");
             var domain  = sel.options[sel.selectedIndex].text;
-
-            var radios = document.getElementsByName('imageS');
+       
+            var radios  = document.getElementsByName('radioImage');
+            var xImage = 0;
             for (var i = 0, length = radios.length; i < length; i++) {
                 if (radios[i].checked) {
                     var xImage = radios[i].value;
                     break;
                 }
             }
-            var xBot    = document.getElementById("xBot"   ).checked | 0;
-            var xCritic = document.getElementById("xCritic").checked | 0;
+            var radios = document.getElementsByName('radioBot');
+            var xBot = 0;
+            for (var i = 0, length = radios.length; i < length; i++) {
+                if (radios[i].checked) {
+                    var xBot = radios[i].value;
+                    break;
+                }
+            }
+            var radios = document.getElementsByName('radioCritic');
+            var xCritic = 0;
+            for (var i = 0, length = radios.length; i < length; i++) {
+                if (radios[i].checked) {
+                    var xCritic = radios[i].value;
+                    break;
+                }
+            }
+            window.location.href = '[% request.uri_base %]/' + domain + '/filter/' + xImage + xBot + xCritic ;
+        }
 
-            window.location.href = '[% request.uri_base %]/' + domain + '/' + xImage + xBot + xCritic + '/1';
+        function clearFilter()  {
+            var sel     = document.getElementById("domain");
+            var domain  = sel.options[sel.selectedIndex].text;
+       
+            window.location.href = '[% request.uri_base %]/' + domain + '/000/1';
         }
 
         /* hide the rows with the error data */
@@ -286,14 +325,18 @@
             /* hide setting buttons div */
             var d = document.getElementById("domain");
             var s = document.getElementById("settings");
+            var t = document.getElementById("toggle");
             var f = document.getElementById("filt");
             var domain = d.options[d.selectedIndex].text;
             s.style.visible = 'visible';
+            t.style.visible = 'visible';
             if (domain == 'Select'){
                 s.style.visibility = 'hidden';
-                f.style.visibility = 'hidden';               
+                t.style.visibility = 'hidden';
+                f.style.visibility = 'hidden';
             } else {
                 s.style.visibility = 'visible';
+                t.style.visibility = 'visible';
             };
             /* hide jumbotron */
             var e = document.getElementById('jumbo');

@@ -33,10 +33,9 @@ get '/' => sub
 
 get 'dns/:ip' => sub 
 {
-	my $host = gethostbyaddr(inet_aton(params->{ip}),AF_INET); 
-debug  index($host,'bot');	
-insert_bots($host,params->{ip}) unless index($host,'bot') == -1;
-        return $host;
+	my $host = gethostbyaddr(inet_aton(params->{ip}),AF_INET) // 'not found'; 
+	insert_bots($host,params->{ip}) unless (index($host,'bot') == -1 || index($host,'spider') == -1);
+    return $host;
 };
 
 get '/domains' => sub 
@@ -73,8 +72,49 @@ post '/domains/:option' => sub
 		my $ok = delete_domains(params->{delete});
 	}
 
-	redirect '../domains',
+	redirect '../domains';
 };
+
+
+get '/logs' => sub 
+{
+	my @dirs=();
+	opendir(DIR, $NGINX_ERROR_LOG) or die "Can't opendir $NGINX_ERROR_LOG: $!";
+ 
+    while (my $sub_folders = readdir(DIR)) 
+    {
+	    next if ($sub_folders =~ /^..?$/);  # skip . and ..
+	    my $path = $NGINX_ERROR_LOG . '/' . $sub_folders;
+	    next unless (-d $path);   # skip anything that isn't a directory
+	    push @dirs, $sub_folders;
+    }
+
+    closedir(DIR);
+
+	template logs => 
+	{ 
+        logs        => logs(),
+        name        => params->{name},
+        url         => params->{url},
+        dirs		=> \@dirs,
+    };
+};
+
+post '/logs/:option' => sub 
+{
+	if (params->{option} eq 'add')
+	{ 
+		debug ;
+		my $ok = insert_logs(params->{name},params->{url});
+	} 
+	elsif (params->{option} eq 'del')
+	{ 
+		my $ok = delete_logs(params->{delete});
+	}
+
+	redirect '../logs';
+};
+
 
 post '/bot/:ip' => sub
 {
@@ -112,7 +152,7 @@ get '/progress' => sub
 
 post '/domain' => sub 
 {
-	redirect '/'.params->{domain}.'/000all/1';
+	redirect '/'.params->{domain}.'/000';
 };
 
 any [ 'get', 'post' ] => '/*/**' => sub 
@@ -129,43 +169,43 @@ any [ 'get', 'post' ] => '/*/**' => sub
 	my $alert 		= '';
 	my $message		= '';
 	my $rows        = 0;
+	my $xImage 		= 0;
+	my $xBot 		= 0;
+	my $xCritic 	= 0;
 
-	if ($filterurl eq 'filter')
-	{
-		$filterurl = params->{filterurl};
-		$lastpage  = 1;
+	if ($filterurl eq 'filter')	{
+		$xImage 	= substr($pageno,0,1);
+		$xBot 		= substr($pageno,1,1);
+		$xCritic 	= substr($pageno,2,1);
+		$pageno 	= 1;
+		$filterurl 	= "$xImage$xBot$xCritic"; 
 	};
 
-	if ($filterurl eq 'insert')
-	{
-		$alert = insert_logs($domain);
+	if ($filterurl eq 'insert')	{
+		$alert = insert_errorlogs($domain);
 		$pageno = 1;
 	};
 
-	if ($filterurl eq 'delete')
-	{
+	if ($filterurl eq 'delete')	{
 		my $date 	= get_epoch_from_eu(params->{deletedate});
-		$alert 		= delete_logs( $domain, $date );
+		$alert 		= delete_errorlogs( $domain, $date );
 		$pageno 	= 1;
 	};
 
-	if ($fix)
-	{
-		$alert = update_logs(params->{fix} );
+	if ($fix){
+		$alert = update_errorlogs(params->{fix},$domain );
+
 	};
 
-	if ($domain ne 'domain')
-	{
+	if ($domain ne 'domain')	{
 		# domain has been selected, determine number of rows and pages
-	    $rows	  = numrows_logs($domain,$filterurl);
+	    $rows	  = numrows_errorlogs($domain,$filterurl);
 	    $lastpage = ceil($rows->{numrows}/$ROWS_PER_PAGE);
 
 		# determine page number
 		if ($pageno  > $lastpage) { $pageno = $lastpage;} 
 		if ($pageno  < 1) 		  { $pageno = 1;} 
-
-	    @data = logs($domain,$filterurl,$pageno);
-	    debug to_dumper(@data);
+	    @data = errorlogs($domain,$filterurl,$pageno);
 	}
 
 	my @fqdn = domains();
@@ -182,9 +222,9 @@ any [ 'get', 'post' ] => '/*/**' => sub
         alert 	 	=> $alert,
         domains     => @fqdn,
         domain      => $domain,
-        xImage  	=> substr($filterurl,0,1) // 0,
-        xBot        => substr($filterurl,1,1) // 0,
-        xCritic     => substr($filterurl,2,1) // 0,	
+        xImage  	=> $xImage,
+        xBot        => $xBot,
+        xCritic     => $xCritic,	
     };
 };
 
