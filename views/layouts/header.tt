@@ -41,6 +41,7 @@ section#content {font-size: 12px;}
 .navbar-right{margin-right: 15px;}
 p.copyright{color: lightgray; margin-top:10px; margin-left: 10px;}
 
+
 </style>
   </head>
   <body>

@@ -20,16 +20,47 @@ our @EXPORT = qw{
     get_id_bots
     insert_bots
     delete_bots
+    accesslogs
+    numrows_accesslogs
+    codes_accesslogs
+    insert_accesslogs
     errorlogs
     numrows_errorlogs
     insert_errorlogs
     update_errorlogs
     delete_errorlogs
+    status_codes
+    insert_status_codes
+    delete_status_codes
+    get_id_status_codes
 };
 
 our $VERSION = '0.1';
 
 =head
+access_log (date,status,ua,request,method,protocol,domain
+
+drop table access_log;
+CREATE TABLE access_log (
+ id integer PRIMARY KEY,
+ date integer NOT NULL,
+ status text,
+ ua text,
+ request text,
+ method text,
+ protocol text,
+ ip text,
+ host text,
+ size integer,
+ domain integer);
+
+drop table status_codes;
+CREATE TABLE status_codes (
+ id integer PRIMARY KEY,
+ code integer,
+ title text,
+ rfc text,
+ explanation text);
 
 drop table error_log;
 CREATE TABLE error_log (
@@ -133,6 +164,57 @@ sub delete_bots
     return 1; 
 }
 
+sub status_codes 
+{
+    return database('sqlserver')->selectall_arrayref( "SELECT * from status_codes order by code", { Slice => {} } );
+}
+
+sub insert_status_codes 
+{
+    my ($code, $title, $explanation, $rfc) = @_ ;
+
+    if ( defined get_id_status_codes($code) ) 
+    {
+        # update
+        my $sth = database('sqlserver')->prepare(q/UPDATE status_codes SET code = ?, title = ?, explanation = ?, rfc = ? /);
+           $sth->execute( $code, $title,$explanation, $rfc ) or die "Cannot update status codes with code=$code";
+           $sth->finish;
+    }
+    else 
+    {
+        if (length $code > 0) {
+            # insert
+            my $sth = database('sqlserver')->prepare(q/INSERT INTO status_codes (code, title, explanation, rfc) VALUES (?,?,?,?);/);
+               $sth->execute( $code, $title,$explanation, $rfc );
+               $sth->finish;
+        }
+    }
+    return
+}
+
+sub get_id_status_codes 
+{
+    my $code = shift // 'no code';
+
+    my $sth = database('sqlserver')->prepare(q/SELECT id from status_codes where code = ?/);
+       $sth->execute($code);
+    my $id = $sth->fetchrow_arrayref;
+       $sth->finish;
+    return $id;
+}
+
+sub delete_status_codes 
+{
+    my $id = shift // 0;
+
+    return 0 unless ($id > 0 );
+
+    my $sth = database('sqlserver')->prepare(q/DELETE FROM status_codes WHERE id = ?;/);
+    $sth->execute($id) or die "Unable to delete.";
+    $sth->finish;
+    return 1; 
+}
+
 sub domains 
 {
     return database('sqlserver')->selectall_arrayref( "SELECT * from domains order by domain", { Slice => {} } );
@@ -204,6 +286,181 @@ sub delete_logs
     return 1; 
 }
 
+sub accesslogs 
+{
+  my $domain      = shift // 'domain';
+  my $filterurl   = shift // '00000';
+  my $pageno      = shift // 1; 
+  
+  my $option      = '';
+  my @array       = ();
+
+    return @array unless ($domain ne 'domain');
+    # filter on images
+    if (substr($filterurl,0,1) == 1) { 
+        $option .= " and RIGHT(request,4) = 'jpeg' OR RIGHT(request,3) IN ('jpg', 'gif', 'png', 'svg') ";
+    } 
+    elsif (substr($filterurl,0,1) == 2) {
+        $option .= " and RIGHT(request,4) <> 'jpeg' OR RIGHT(request,3) NOT IN ('jpg', 'gif', 'png','svg') ";
+    } 
+
+    # filter on bots
+    if (substr($filterurl,1,1)==1) { 
+        $option .= " and bots.ip is null"; 
+    }
+    elsif (substr($filterurl,1,1)==2){
+        $option .= " and bots.ip is not null"; 
+    }
+  
+    # filter on status code
+    if (int(substr($filterurl,2,3)) > 0){ 
+        $option .= ' and status = '.substr($filterurl,2,3).' '; 
+    }
+ 
+    my $qry  = "SELECT count(*) as cnt, strftime('%d-%m-%Y',date(a.date,'unixepoch')) as eudate, a.id as theid, 
+                    date,status,a.ua,a.ip,host,request,method,protocol,domain,size, bots.ua as bot 
+                    FROM access_log a LEFT JOIN bots on a.ip = bots.ip 
+                    WHERE domain like '$domain' $option 
+                    GROUP BY request 
+                    ORDER BY a.date DESC LIMIT " .($pageno - 1) * $LogReader::ROWS_PER_PAGE .','. $LogReader::ROWS_PER_PAGE;
+
+    return database('sqlserver')->selectall_arrayref( $qry, { Slice => {} } );
+}
+
+sub numrows_accesslogs 
+{
+    my $domain      = shift // 'domain';
+    my $filterurl   = shift // '00000';
+    my $option      = '';
+    
+    return 0 unless ($domain ne 'domain');
+
+    # filter on images
+    if (substr($filterurl,0,1) == 1) { 
+        $option .= " and RIGHT(request,4) = 'jpeg' OR RIGHT(request,3) IN ('jpg', 'gif', 'png', 'svg') ";
+    } 
+    elsif (substr($filterurl,0,1) == 2) {
+        $option .= " and RIGHT(request,4) <> 'jpeg' OR RIGHT(request,3) NOT IN ('jpg', 'gif', 'png','svg') ";
+    } 
+
+    # filter on bots
+    if (substr($filterurl,1,1)==1) { 
+        $option .= " and bots.ip is null"; 
+    }
+    elsif (substr($filterurl,1,1)==2){
+        $option .= " and bots.ip is not null"; 
+    }
+
+    # filter on status code  
+    if (substr($filterurl,2,3) > 0){ 
+        $option .= ' and status = '.substr($filterurl,2,3).' '; 
+    }
+ 
+    my  $qry = "SELECT  count(*) as numrows, 
+                        strftime('%d-%m-%Y',date(min(date),'unixepoch')) as firstdate, 
+                        strftime('%d-%m-%Y',date(max(date),'unixepoch')) as lastdate  
+                FROM    access_log 
+                WHERE   domain like ? $option";
+
+    my $sth = database('sqlserver')->prepare($qry);
+    $sth->execute($domain);
+    my $row = $sth->fetchrow_hashref('NAME_lc');
+    $sth->finish;
+
+    return $row;
+}
+
+sub codes_accesslogs {
+
+    my $domain  = shift // 'code'; 
+    my $qry     = "SELECT status, title FROM access_log a left join status_codes s on a.status=s.code WHERE domain like '$domain' GROUP BY status";
+    return database('sqlserver')->selectall_arrayref( $qry, { Slice => {} } );
+}
+
+sub insert_accesslogs 
+{
+  # variable passed
+  my $domain = shift // 0;
+
+  # initialise variables
+  my @data;
+  my $alert;
+  my $fh;
+  my $ph;
+  my $counter       = 0;
+  my $progress      = 0;
+  my $progress_last = 0;
+
+  # determine the last date entered
+  my  $lastdate = database('sqlserver')->selectrow_array("SELECT max(date) as lastdate FROM access_log WHERE domain like '%$domain%';");
+      $lastdate = $lastdate // 0;
+
+    # obtain the files handler
+    unless (open (FH, '<:encoding(UTF-8)', $LogReader::NGINX_ERROR_LOG."/$domain/access.log")) {
+        $alert->{type}    = 'warning';
+        $alert->{message} = "Cannot open log file ".$LogReader::NGINX_ERROR_LOG."/$domain/access.log: $!";
+        return $alert;
+    }
+
+    # determine number of lines in the file
+    my @lines = <FH>;
+    my $progress_total = scalar @lines // 1;
+    seek FH, 0, 0;
+
+    # prepare session variables
+    my $application = app();
+    my $my_session  = LogReader::session();
+
+    my $qry = q/INSERT INTO access_log (date,status,ua,ip,host,request,method,protocol,domain,size) 
+               VALUES (?,?,?,?,?,?,?,?,?,?);/; 
+    my $sth = database('sqlserver')->prepare($qry);
+
+    # start the work
+    while (my $line = <FH>) 
+    {
+        $counter += 1; 
+
+        # start splittng the line into fields
+        my @vars    = split / /, $line, 9;
+        my $ip      = $vars[0]; 
+        my @status  = split / /,$vars[8];
+        my $size    = $status[1];
+        my $status  = $status[0];
+        my @quotes  = $line =~ /"([^"]*)"/g;
+        my $host    = $quotes[1];
+        my $ua      = $quotes[2];
+        my ($method,$request,$protocol) = split / /,$quotes[0];
+          
+        # determine the date of this entry
+        my ($dd,$mm,$year) = split /\//, (substr $vars[3],1);
+        my ($yyyy,$hour,$min,$sec) = split /:/,$year;
+        my $thisdate  = LogReader::timelocal($sec, $min, $hour, $dd, LogReader::month2num($mm) -1, ($yyyy - 1900));
+        my $date      = $thisdate;
+
+        # only enter new data
+        next if ($thisdate < $lastdate);
+
+        # update the progress session to monitor the progress
+        if (($counter%100) == 0) {
+            LogReader::session( 'progress' => (int($counter / $progress_total * 100)) ) ;
+            $application->session_engine->flush( session => $my_session );
+        }
+
+        $sth->execute("$date","$status","$ua","$ip","$host","$request","$method","$protocol","$domain",$size) 
+            or die 'Unable to insert.';
+        $sth->finish;
+    };
+    close FH;
+
+    LogReader::session( 'progress' => 100 );
+    $application->session_engine->flush( session => $my_session );
+
+    $alert->{type}    = 'success';
+    $alert->{message} = 'Log data inserted into the database';
+
+    return $alert;
+}
+
 sub errorlogs 
 {
   my $domain      = shift // 'domain';
@@ -253,8 +510,6 @@ sub numrows_errorlogs
     my $filterurl   = shift // '000';
     my $option      = '';
     
-    debug $domain;
-    debug $filterurl;
     return 0 unless ($domain ne 'domain');
 
     # filter on images
@@ -329,6 +584,10 @@ sub insert_errorlogs
   my $application = app();
   my $my_session  = LogReader::session();
 
+    my $qry = qq(INSERT INTO error_log (date,status,client,server,request,method,host,error,fix,domain) 
+                VALUES (?,?,?,?,?,?,?,?,0,?);); 
+    my $sth = database('sqlserver')->prepare($qry);
+
   # start the work
   while (my $line = <FH>) 
   {
@@ -391,13 +650,9 @@ sub insert_errorlogs
         # $field->{four }  = $vars[4];
         # $body_bytes_sent = $vars2[0];
         
-        my $qry = qq(INSERT INTO error_log (date,status,client,server,request,method,host,error,fix,domain) 
-                    VALUES      (?,?,?,?,?,?,?,?,0,?);); 
-
-        my $sth = database('sqlserver')->prepare($qry);
-           $sth->execute("$date","$status","$client","$server","$request","$method","$host","$error","$domain") 
-              or die "Unable to insert.";
-           $sth->finish;
+        $sth->execute("$date","$status","$client","$server","$request","$method","$host","$error","$domain") 
+            or die "Unable to insert.";
+        $sth->finish;
   };
   close FH;
 

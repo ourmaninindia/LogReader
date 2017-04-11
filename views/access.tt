@@ -4,13 +4,13 @@
         <div class="row">
             <div class="col-md-3">
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="[% request.uri_base %]/">LogReader | <small>Error Log</small></a>
+                    <a class="navbar-brand" href="[% request.uri_base %]/">LogReader | Access</a>
                 </div>
             </div>
             <div class="col-md-3">&nbsp;</div>
             <div class="col-md-3">
                 <div id="navbar" class="navbar-collapse collapse">
-                    <form class="navbar-form navbar-right" method="POST" action="[% request.uri_base %]/error/domain">                    
+                    <form class="navbar-form navbar-right" method="POST" action="[% request.uri_base %]/access/domain">                    
                         <div class="form-group">
                             <select name="domain" id="domain" class="form-control">
                                 <option value="domain">Select</option>
@@ -19,7 +19,7 @@
                                 [% END %]
                             </select> 
                         </div>
-                        <button type="submit" class="btn btn-success" onclick="DomainSelected();">Select</button>                
+                        <button type="submit" class="btn btn-success">Select</button>                
                     </form>
                 </div>
             </div>
@@ -53,7 +53,7 @@
 
             <div class="col-md-5">&nbsp;</div>
             <!-- delete -->
-            <form class="clearfix" action="[% request.uri_base %]/[% domain %]/error/delete" method="POST">
+            <form class="clearfix" action="[% request.uri_base %]/[% domain %]/delete" method="POST">
                 <div class="col-md-2 nopadding">
                     <div class="form-group">
                         <div class='input-group date' id='deletedate'>
@@ -85,15 +85,12 @@
     </div>
     <div class="col-md-1">
         <b>Updated</b><br> [% records.lastdate %]
-    </div>
+    </div>        
     <div class="col-md-1">
         <b>Records</b><br> [% records.numrows %]
     </div>
-    <div class="col-md-1">
+    <div class="col-md-9">
         &nbsp;
-    </div>
-    <div class="col-md-8">
-        &nbsp;   
     </div>
 </div>
 <br>
@@ -107,10 +104,13 @@
         <input type="radio" name="radioBot" value="1"[% IF xBot == 1 %] checked[% END %]> No Bots &nbsp;&nbsp;&nbsp;
         <input type="radio" name="radioBot" value="2"[% IF xBot == 2 %] checked[% END %]> Bots &nbsp;&nbsp;&nbsp;
     </span>&nbsp;&nbsp;&nbsp;
-    <span style="border:1px solid blue; padding: 4px 5px 7px 5px;">
-        <input type="radio" name="radioCritic" value="1"[% IF xCritic == 1 %] checked[% END %]> Error &nbsp;&nbsp;&nbsp;
-        <input type="radio" name="radioCritic" value="2"[% IF xCritic == 2 %] checked[% END %]> Critic &nbsp;&nbsp;&nbsp;
-    </span>&nbsp;&nbsp;&nbsp;
+    <select id="status" name="status">
+        <option value="000">Select</option>
+        [% FOREACH code in codes -%]
+        <option value="[% code.status %]" [% IF code.status == xStatus %] selected[% END %]>[% code.status %] [% code.title %] </option>
+        [% END %]
+    </select>            
+    &nbsp;&nbsp;&nbsp;
     <button onclick="clickFilter()" class="btn btn-md btn-primary "><span class="glyphicon glyphicon-filter"></span></button>
 </div>
 <br>
@@ -119,8 +119,8 @@
     [% IF pageno == 1 %]
     FIRST PREV
     [% ELSE %]
-    <a href='[% request.uri_base %]/[% domain %]/error/[% filterurl %]/1'>FIRST</a> 
-    <a href='[% request.uri_base %]/[% domain %]/error/[% filterurl %]/[% prevpage %]'>PREV</a>
+    <a href='[% request.uri_base %]/access/[% domain %]/[% filterurl %]/1'>FIRST</a> 
+    <a href='[% request.uri_base %]/access/[% domain %]/[% filterurl %]/[% prevpage %]'>PREV</a>
     [% END %] 
     
     ( Page [% pageno %] of [% lastpage %] ) 
@@ -128,8 +128,8 @@
     [% IF (pageno == lastpage) %]
     NEXT LAST
     [% ELSE %]
-    <a href='[% request.uri_base %]/[% domain %]/error/[% filterurl %]/[% nextpage %]'>NEXT</a>
-    <a href='[% request.uri_base %]/[% domain %]/error/[% filterurl %]/[% lastpage %]'>LAST</a>
+    <a href='[% request.uri_base %]/access/[% domain %]/[% filterurl %]/[% nextpage %]'>NEXT</a>
+    <a href='[% request.uri_base %]/access/[% domain %]/[% filterurl %]/[% lastpage %]'>LAST</a>
     [% END %]
     </div>
     <div class="col-md-2 red" id="hostname"></div>
@@ -137,42 +137,60 @@
     <div class="col-md-1"></div>
 </div>
 
-<form action="[% request.uri_base %]/error/[% domain %]/[% filterurl %]/[% pageno %]/fix" method="POST">
+<form action="[% request.uri_base %]/access/[% domain %]/[% filterurl %]/[% pageno %]/fix" method="POST">
+
     <div class="row">
         <div class="col-md-1"><b>Date</b></div>
-        <div class="col-md-1"><b>Status</b></div>
-        <div class="col-md-1"><b>method</b></div>
+        <div class="col-md-1">
+            <div class="row">
+                    <div class="col-md-6">
+                        <b>Status</b>
+                    </div>
+                    <div class="col-md-6">
+                        <b>Method</b>
+                    </div>
+                </div>
+            </div>
+        <div class="col-md-1"><b>IP</b></div>
         <div class="col-md-4"><b>Request</b></div>
-        <div class="col-md-2"><b>Client</b></div>
+        <div class="col-md-2"><b>UA</b></div>
         <div class="col-md-2"><b>Host</b></div>
         <div class="col-md-1">
             <div class="row">
                 <div class="col-md-6">
-                    Total
+                    <b>Total</b>
                 </div>
                 <div class="col-md-6">
-                    Delete
+                    <b>Delete</b>
                 </div>
             </div>
         </div>
     </div>
     <div class="row toggle-row">
-        <div class="col-md-1">
-            <b>id</b>
-        </div>
-        <div class="col-md-11">
-            <b>Error</b>
-        </div>
+        <div class="col-md-1"><b>id</b></div>
+        <div class="col-md-1"><b>Protocol</b></div>
+        <div class="col-md-1"><b>Size</b></div>
+        <div class="col-md-9"><b>UA</b></div>
     </div>
+
     [% FOREACH line IN data -%]
+
     <div class="[% IF loop.odd %]odd[% ELSE %]even[% END %]">
         <div class="row">
-            <div class="col-md-1">[% line.eudate      %]</div>
-            <div class="col-md-1">[% line.status      %]</div>
-            <div class="col-md-1">[% line.method      %]</div>
+            <div class="col-md-1">[% line.eudate %]</div>
+            <div class="col-md-1">
+                <div class="row">
+                    <div class="col-md-6">
+                        [% line.status %]
+                    </div>
+                    <div class="col-md-6">
+                        [% line.method %]
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1"><a onclick="dnslookup('[% line.ip %]')" href="#">[% line.ip %]</a></div>
             <div class="col-md-4 red">[% line.request %]</div>
-            <div class="col-md-2"><a onclick="dnslookup('[% line.client %]')" href="#">[% line.client %]</a></div>
-            <div class="col-md-2">[% line.host        %]</div>
+            <div class="col-md-4">[% line.host %]</div>
             <div class="col-md-1">
                 <div class="row">
                     <div class="col-md-6">
@@ -186,24 +204,31 @@
         </div>
         <div class="row toggle-row">
             <div class="col-md-1">
-                id=[% line.theid %]
+                [% line.theid %]
             </div>
-            <div class="col-md-11">
-                [% line.error %]
+            <div class="col-md-1">
+                [% line.protocol %]
+            </div>
+            <div class="col-md-1">
+                [% line.size %]
+            </div>
+            <div class="col-md-9">
+                [% line.ua %]
             </div>
         </div>
     </div>
+
     [% END %]
+
     <div class="row">
         <div class="col-md-11">&nbsp;</div>
         <div class="col-md-1 right"><button type="submit" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-warning"></span>Delete</button></div>
     </div>
 </form>
-
 </div>
 [% INCLUDE layouts/footer.tt %]     
 
-    <script type="text/javascript">
+        <script type="text/javascript">
 
     function dnslookup(data) {
         var xhr = new XMLHttpRequest();
@@ -235,7 +260,7 @@
     function deletedata () {
         var date = $('#deletedate').val();
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', "[% request.uri_base %]/error/" + domain + "/delete", true);
+        xhr.open('POST', "[% request.uri_base %]/access/" + domain + "/delete", true);
         xhr.send();
     }
 
@@ -255,7 +280,7 @@
         var sel = document.getElementById("domain");
         var domain = sel.options[sel.selectedIndex].text;
 
-        window.location.href = '[% request.uri_base %]/error/' + domain + '/insert';
+        window.location.href = '[% request.uri_base %]/access/' + domain + '/insert';
     }
 
     function clickFilter()  {
@@ -278,22 +303,16 @@
                 break;
             }
         }
-        var radios = document.getElementsByName('radioCritic');
-        var xCritic = 0;
-        for (var i = 0, length = radios.length; i < length; i++) {
-            if (radios[i].checked) {
-                var xCritic = radios[i].value;
-                break;
-            }
-        }
-        window.location.href = '[% request.uri_base %]/error/' + domain + '/filter/' + xImage + xBot + xCritic ;
+        var sel  = document.getElementById("status");
+        var code = sel.options[sel.selectedIndex].value;
+        window.location.href = '[% request.uri_base %]/access/' + domain + '/filter/' + xImage + xBot + code ;
     }
 
     function clearFilter()  {
         var sel     = document.getElementById("domain");
         var domain  = sel.options[sel.selectedIndex].text;
    
-        window.location.href = '[% request.uri_base %]/error/' + domain + '/000/1';
+        window.location.href = '[% request.uri_base %]/access/' + domain + '/000/1';
     }
 
     /* hide the rows with the error data */

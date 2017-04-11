@@ -25,8 +25,7 @@ hook after_request => sub
 
 get '/' => sub 
 {
-    template dashboard => 
-    {
+    template dashboard =>  {
     	domains     => domains(),
     };
 };
@@ -150,12 +149,12 @@ get '/progress' => sub
 	return session('progress');
 };
 
-post '/domain' => sub 
+post '/error/domain' => sub 
 {
-	redirect '/'.params->{domain}.'/000';
+	redirect '../error/'.params->{domain}.'/000';
 };
 
-any [ 'get', 'post' ] => '/*/**' => sub 
+any [ 'get', 'post' ] => '/error/*/**' => sub 
 { 
 	# variables passed
 	my ( $domain, $arg ) = splat;
@@ -208,24 +207,136 @@ any [ 'get', 'post' ] => '/*/**' => sub
 	    @data = errorlogs($domain,$filterurl,$pageno);
 	}
 
-	my @fqdn = domains();
-
     template LogReader => 
     { 
     	pageno   	=> $pageno,
     	prevpage 	=> ($pageno == 1) ? 1 : ($pageno - 1),
     	lastpage 	=> $lastpage,
     	nextpage 	=> ($pageno +1),
-        data 	 	=> @data,
+        data 	 	=> ((scalar @data > 0) ? @data : ''),
         filterurl 	=> $filterurl,
         records		=> $rows,
         alert 	 	=> $alert,
-        domains     => @fqdn,
+        domains     => domains(),
         domain      => $domain,
         xImage  	=> $xImage,
         xBot        => $xBot,
         xCritic     => $xCritic,	
     };
+};
+
+any [ 'get', 'post' ] => '/access/*/**' => sub 
+{ 
+	# variables passed
+	my ( $domain, $arg ) = splat;
+	my $filterurl 	= @{$arg}[0] // '000';
+   	my $pageno 		= @{$arg}[1] // 0;
+	my $fix    		= @{$arg}[2] // 0;
+	
+   	# declarations
+	my $lastpage    = 1;
+	my @data 		= ();
+	my $alert 		= '';
+	my $message		= '';
+	my $rows        = 0;
+	my $xImage 		= 0;
+	my $xBot 		= 0;
+	my $xStatus 	= 0;
+
+	if ($filterurl eq 'filter')	{
+		$xImage 	= substr($pageno,0,1) // 0 ;
+		$xBot 		= substr($pageno,1,1) // 0 ;
+		$xStatus 	= substr($pageno,2,3) // 0 ;
+		$pageno 	= 1;
+		$filterurl 	= "$xImage$xBot$xStatus"; 
+	};
+
+	if ($filterurl eq 'insert')	{
+		$alert = insert_accesslogs($domain);
+		$pageno = 1;
+	};
+
+	if ($filterurl eq 'delete')	{
+		my $date 	= get_epoch_from_eu(params->{deletedate});
+		$alert 		= delete_accesslogs( $domain, $date );
+		$pageno 	= 1;
+	};
+
+	if ($fix){
+		$alert = update_accesslogs(params->{fix},$domain );
+
+	};
+
+	if ($domain ne 'domain')	{
+		# domain has been selected, determine number of rows and pages
+	    $rows	  = numrows_accesslogs($domain,$filterurl);
+	    $lastpage = ceil($rows->{numrows}/$ROWS_PER_PAGE);
+
+		# determine page number
+		if ($pageno  > $lastpage) { $pageno = $lastpage;} 
+		if ($pageno  < 1) 		  { $pageno = 1;} 
+	    @data = accesslogs($domain,$filterurl,$pageno);
+	}
+
+    template access => 
+    { 
+    	pageno   	=> $pageno,
+    	prevpage 	=> ($pageno == 1) ? 1 : ($pageno - 1),
+    	lastpage 	=> $lastpage,
+    	nextpage 	=> ($pageno +1),
+        data 	 	=> ((scalar @data > 0) ? @data : ''),
+        filterurl 	=> $filterurl,
+        records		=> $rows,
+        alert 	 	=> $alert,
+        domains     => domains(),
+        domain      => $domain,
+        xImage  	=> $xImage,
+        xBot        => $xBot,
+        xStatus		=> $xStatus,
+        codes 		=> codes_accesslogs($domain),	
+    };
+};
+
+get '/status-codes' => sub {
+	template status_codes => 
+	{
+		codes => status_codes(),
+	}
+};
+
+post '/status-codes/:option' => sub 
+{
+	if (params->{option} eq 'add'){ 
+		my $ok = insert_status_codes(params->{code},params->{title},params->{explanation},params->{rfc});
+	} elsif (params->{option} eq 'del'){ 
+		my $ok = delete_status_codes(params->{delete});
+	}
+
+	redirect '../status-codes';
+};
+
+get '/enter-status-codes' => sub {
+
+    open (FH, '<:encoding(UTF-8)', "/home/alfred/webapps/statuscodes") or die "Cannot open file : $!";
+
+  	my $qry = q/INSERT INTO status_codes (code,title,explanation,rfc) VALUES (?,?,?,?);/; 
+  	my $sth = database('sqlserver')->prepare($qry);
+
+    while (my $line = <FH>) 
+    {
+        my ($one,$expl) = split /\|/, $line; 
+        my ($code,$titlex) = split / /,$one,2;
+        my ($title,$rfc) = split /\(/,$titlex;
+        $rfc =~ tr/)//;
+      	$sth->execute("$code","$title","$expl","$rfc") or die "Unable to insert.";
+      	$sth->finish;
+    };
+    close FH;
+};
+
+post '/access/domain' => sub 
+{
+	redirect '../access/'.params->{domain}.'/000';
 };
 
 
@@ -265,5 +376,10 @@ sub get_epoch_from_eu {
 	return $standard_time;
 }
 
+sub month2num {
+	my $month = shift;
+	my %mon2num = qw(jan 1  feb 2  mar 3  apr 4  may 5  jun 6  jul 7  aug 8  sep 9  oct 10 nov 11 dec 12);
+	return $mon2num{ lc substr($month, 0, 3) };
+}
 
 1;

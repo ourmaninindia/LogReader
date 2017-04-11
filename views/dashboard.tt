@@ -44,9 +44,11 @@
                     <ul class="list">    
                         <li><a href="../" class="active">Dashboard</a></li>
                         <li><a href="../domains">Domains</a></li>
-                        <li><a href="../domain/000">Error Logs</a></li>
+                        <li><a href="../access/domain/000">Access Logs</a></li>
+                        <li><a href="../error/domain/000">Error Logs</a></li>
                         <li><a href="../bots">Bots</a></li>
                          <li><a href="../logs">Logs</a></li>
+                         <li><a href="../status-codes">Status Codes</a></li>
                         <li><a href="http://getbootstrap.com/components/" target="_blank">Bootstrap</a></li>
                         <li><a href="#">[% sess %]</a></li>
                     </ul>
