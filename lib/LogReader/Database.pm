@@ -468,7 +468,7 @@ sub insert_domains
 {
     my $domain     = shift // '';
     my $fqdn       = shift // '';
-    my $image_url  = shift // '';
+    my $image_url  = shift // '1600x900.png';
     my $clients_id = shift // 0;
 
   return 0 unless (length($domain) != 0 );
