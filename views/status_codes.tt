@@ -4,14 +4,10 @@
         <div class="row">
             <div class="col-md-3">
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="../">LogReader | <small>Status Codes</small></a>
+                    <a class="navbar-brand" href="../">LogReader </a>
                 </div>
             </div>
-            <div class="col-md-2">
-            </div>
-            <div class="col-md-5">
-                
-            </div>
+            <div class="col-md-7"></div>
             <div class="col-md-2 navbar-form navbar-right"> 
                 <button onclick="toggleSettings();" class="btn btn-info btn-md "><span class="glyphicon glyphicon-wrench"></span></button>
                 &nbsp;&nbsp;&nbsp;
@@ -20,40 +16,57 @@
     </nav>
 
     <!-- Main jumbotron  -->
-    <div class="jumbotron">
-        <div id="settings">
-            <div class="row">&nbsp;</div>
-            <div class="row">
-                <!-- add -->
-                <div class="col-md-6">
-                <form class="navbar-form" method="POST" action="[% request.uri_base %]/status-codes/add">
-                    <div class="form-group">
-                        <input type="text" name="code" placeholder="Code" class="input">
-                        <input type="text" name="title" placeholder="Title" class="input"><br>
-                        <input type="text" name="explanation" placeholder="Explanation" class="input"><br>
-                        <input type="text" name="rfc" placeholder="RFC" class="input">
-                        <button type="submit" class="btn btn-success">Add&nbsp;&nbsp;</button>    
-                    </div>            
-                </form> 
+    <div id="jumbo">
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <!-- add -->
+            <div class="col-md-6">
+            <form class="navbar-form" method="POST" action="[% request.uri_base %]/status-codes/add">
+                <div class="form-group">
+                    <input type="text" name="code" placeholder="Code" class="input">
+                    <input type="text" name="title" placeholder="Title" class="input"><br>
+                    <input type="text" name="explanation" placeholder="Explanation" class="input"><br>
+                    <input type="text" name="rfc" placeholder="RFC" class="input">
+                    <button type="submit" class="btn btn-success">Add&nbsp;&nbsp;</button>    
+                </div>            
+            </form> 
+            </div>
+            <!-- delete -->
+            <div class="col-md-6">
+            <form class="navbar-form" method="POST" action="[% request.uri_base %]/status-codes/del">
+                <div class="form-group">
+                    <select name="delete" id="code" class="form-control">
+                        <option value="code"> Select</option>
+                        [% FOREACH code in codes -%]
+                        <option value="[% code.id %]">[% code.code %] [% code.title %]</option>
+                        [% END %]
+                    </select> 
                 </div>
-                <!-- delete -->
-                <div class="col-md-6">
-                <form class="navbar-form" method="POST" action="[% request.uri_base %]/status-codes/del">
-                    <div class="form-group">
-                        <select name="delete" id="code" class="form-control">
-                            <option value="code"> Select</option>
-                            [% FOREACH code in codes -%]
-                            <option value="[% code.id %]">[% code.code %] [% code.title %]</option>
-                            [% END %]
-                        </select> 
-                    </div>
-                    <button type="submit" class="btn btn-danger">Delete</button>                
-                </form> 
-                </div>
+                <button type="submit" class="btn btn-danger">Delete</button>                
+            </form> 
+            </div>
+        </div>
+    </div>
+    <!-- edit  --> 
+    <div id="edit">
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <div class="col-md-6">
+            <form name="edit" class="navbar-form" method="POST" action="[% request.uri_base %]/status-codes/update">
+                <div class="form-group">
+                    <input type="text" name="code" placeholder="Status Code" class="input" size="50"><br>
+                    <input type="text" name="title" placeholder="Title" class="input" size="50"><br>
+                    <input type="text" name="explanation" placeholder="Explanation" class="input" size="50"><br>
+                    <input type="text" name="rfc" placeholder="RFC" class="input" size="50"><br>
+                    <button type="submit" class="btn btn-success">Update&nbsp;&nbsp;</button>    
+                </div>            
+            </form> 
             </div>
         </div>
     </div>
 
+
+    <h3>Status Codes</h3>
     
     [% IF alert.type == "success" %]<div class = "alert alert-success">[% alert.message %]</div>[% END %]
     [% IF alert.type == "info"    %]<div class = "alert alert-info"   >[% alert.message %]</div>[% END %]
@@ -64,30 +77,55 @@
     <div class="row">
         <div class="col-md-1"><b>Code</b></div>
         <div class="col-md-2"><b>Title</b></div>
-        <div class="col-md-8"><b>Explanation</b></div>
+        <div class="col-md-7"><b>Explanation</b></div>
         <div class="col-md-1"><b>RFC</b></div>
+        <div class="col-md-1"><b>Edit</b></div>
     </div>
+   
     [% FOREACH code in codes -%]
     <div class="row">
         <div class="col-md-1">[% code.code %]</div>
-        <div class="col-md-2">[% code.title %]</div>
-        <div class="col-md-8">[% code.explanation %]</div>
-        <div class="col-md-1">[% code.rfc %]</div>
+        <div class="col-md-2" id="t[% code.code %]">[% code.title %]</div>
+        <div class="col-md-7" id="e[% code.code %]">[% code.explanation %]</div>
+        <div class="col-md-1" id="r[% code.code %]">[% code.rfc %]</div>
+        <div class="col-md-1">
+            <button onclick='editThis([% code.code %]);' class="btn btn-xs btn-info"><span class="glyphicon glyphicon-edit"></span></button>  
+        </div>
     </div>
-    [% END %]    
+    [% END %]
+    
 </div>
 
 [% INCLUDE layouts/footer.tt %]    
 
 <script type="text/javascript">
 
-    /* settings */
+    function editThis(){
+        var code  = arguments[0];
+        var expl  = document.getElementById('e'+code).innerHTML;
+        var title = document.getElementById('t'+code).innerHTML;
+        var rfc   = document.getElementById('r'+code).innerHTML;
+      
+        var j = document.getElementById('jumbo');
+        j.style.display = 'none';  
+        var e = document.getElementById('edit');
+        e.style.display = 'block';
+        document.forms["edit"]["code" ].value = code;
+        document.forms["edit"]["title"].value = title;
+        document.forms["edit"]["explanation"].value = expl;
+        document.forms["edit"]["rfc"  ].value = rfc;
+    }
+
+    /* hide jumbo section */
     function toggleSettings() {
-        var e = document.getElementById('settings');
-        if (e.style.display === 'none' || e.style.display === '') {
-            e.style.display = 'block';
+        var e = document.getElementById('edit');
+        e.style.display = 'none';
+
+        var j = document.getElementById('jumbo');
+        if (j.style.display === 'none' || j.style.display === '') {
+            j.style.display = 'block';
         } else {
-            e.style.display = 'none';
+            j.style.display = 'none';
         }
     }
 

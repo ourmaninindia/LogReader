@@ -11,9 +11,12 @@ use Data::Dumper;
 use POSIX qw/ceil/;
 use Time::Local;
 use Socket;
+#use LWP::Simple qw/head/;
+use LWP::UserAgent;
+use open qw(:std :utf8);
 
 our $VERSION 		 = '0.1';
-our $NGINX_ERROR_LOG = '/var/log/nginx/';
+our $NGINX_ERROR_LOG = '/var/log/nginx';
 our $ROWS_PER_PAGE   = 15;
 
 hook after_request => sub 
@@ -25,8 +28,29 @@ hook after_request => sub
 
 get '/' => sub 
 {
+	my @domains = domains();
+	my $i 		= 0;
+	my $ua 		= LWP::UserAgent->new( ssl_opts => { verify_hostname => 0 } );
+
+	while ($domains[0][$i]){
+		
+		my $url=$domains[0][$i]->{fqdn};
+
+		$domains[0][$i]->{up} = 0; 
+
+		if ( defined($url)>0 ) {
+			my $response = $ua->head($url);
+			debug $url;
+			debug to_dumper($response);
+
+			if ( $response->is_success ) {
+				$domains[0][$i]->{up} = 1; 
+			}
+		}
+		$i++;
+    }
     template dashboard =>  {
-    	domains     => domains(),
+    	domains     => @domains,
     };
 };
 
@@ -35,6 +59,32 @@ get 'dns/:ip' => sub
 	my $host = gethostbyaddr(inet_aton(params->{ip}),AF_INET) // 'not found'; 
 	insert_bots($host,params->{ip}) unless (index($host,'bot') == -1 || index($host,'spider') == -1);
     return $host;
+};
+
+get '/clients' => sub 
+{
+	template clients => 
+	{ 
+        clients => clients(),
+    };
+};
+
+post '/clients/:option' => sub 
+{
+	if (params->{option} eq 'add')
+	{ 
+		insert_clients(params->{client},params->{email});
+	} 
+	elsif (params->{option} eq 'del')
+	{ 
+		delete_clients(params->{delete});
+	}
+	elsif (params->{option} eq 'update')
+	{
+		update_clients(params->{id},params->{client},params->{email});
+	}
+
+	redirect '../clients';
 };
 
 get '/domains' => sub 
@@ -55,6 +105,7 @@ get '/domains' => sub
 	template domains => 
 	{ 
         domains     => domains(),
+        clients     => clients(),
         name        => params->{name},
         dirs		=> \@dirs,
     };
@@ -64,11 +115,15 @@ post '/domains/:option' => sub
 {
 	if (params->{option} eq 'add')
 	{ 
-		my $ok = insert_domains(params->{name});
+		my $ok = insert_domains(params->{domain},params->{fqdn},params->{image_url});
 	} 
 	elsif (params->{option} eq 'del')
 	{ 
 		my $ok = delete_domains(params->{delete});
+	}
+	elsif (params->{option} eq 'update')
+	{
+		my $ok = update_domains(params->{id},params->{domain},params->{fqdn},params->{image_url},params->{client});
 	}
 
 	redirect '../domains';
@@ -306,10 +361,10 @@ get '/status-codes' => sub {
 
 post '/status-codes/:option' => sub 
 {
-	if (params->{option} eq 'add'){ 
-		my $ok = insert_status_codes(params->{code},params->{title},params->{explanation},params->{rfc});
+	if ((params->{option} eq 'add') || (params->{option} eq 'update')) { 
+		insert_status_codes(params->{code},params->{title},params->{explanation},params->{rfc});
 	} elsif (params->{option} eq 'del'){ 
-		my $ok = delete_status_codes(params->{delete});
+		delete_status_codes(params->{delete});
 	}
 
 	redirect '../status-codes';
@@ -319,17 +374,13 @@ get '/enter-status-codes' => sub {
 
     open (FH, '<:encoding(UTF-8)', "/home/alfred/webapps/statuscodes") or die "Cannot open file : $!";
 
-  	my $qry = q/INSERT INTO status_codes (code,title,explanation,rfc) VALUES (?,?,?,?);/; 
-  	my $sth = database('sqlserver')->prepare($qry);
-
     while (my $line = <FH>) 
     {
-        my ($one,$expl) = split /\|/, $line; 
-        my ($code,$titlex) = split / /,$one,2;
-        my ($title,$rfc) = split /\(/,$titlex;
+        my ($one,$expl) 	= split /\|/, $line; 
+        my ($code,$titlex) 	= split / /,$one,2;
+        my ($title,$rfc) 	= split /\(/,$titlex;
         $rfc =~ tr/)//;
-      	$sth->execute("$code","$title","$expl","$rfc") or die "Unable to insert.";
-      	$sth->finish;
+      	insert_status_codes("$code","$title","$expl","$rfc");
     };
     close FH;
 };

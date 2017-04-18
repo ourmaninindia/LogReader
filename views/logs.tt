@@ -21,7 +21,7 @@
 
     <!-- Main jumbotron  -->
     <div class="jumbotron">
-        <div id="settings">
+        <div id="jumbo">
             <div class="row">&nbsp;</div>
             <div class="row">
                 <!-- add -->
@@ -51,7 +51,7 @@
             </div>
         </div>
     </div>
-
+ <h3>Log Types</h3>
     
     [% IF alert.type == "success" %]<div class = "alert alert-success">[% alert.message %]</div>[% END %]
     [% IF alert.type == "info"    %]<div class = "alert alert-info"   >[% alert.message %]</div>[% END %]
@@ -83,13 +83,11 @@
                 </div>
                 [% END %]
             </div>
-            <div class="col-md-6">
-                <div><p><b>Logfiles</b></p></div>
-                <div class="form-group">
-                    [% FOREACH dir in dirs -%]
-                    <p>[% dir %]</p>
-                    [% END %]    
-                </div>            
+            <div class="col-md-6 aliceblue">
+                <div class="form-group"><b>Available Logfiles</b></div>
+                [% FOREACH dir in dirs -%]
+                <div class="form-group">[% dir %]</div>
+                [% END %]                
             </div>
         </div>
     </div>

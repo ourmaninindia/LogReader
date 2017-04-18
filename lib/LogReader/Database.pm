@@ -10,8 +10,13 @@ use Data::Dumper;
 use Exporter qw{import};
 
 our @EXPORT = qw{
+    clients
+    insert_clients
+    update_clients
+    delete_clients
     domains 
     insert_domains
+    update_domains
     delete_domains
     logs 
     insert_logs
@@ -24,6 +29,8 @@ our @EXPORT = qw{
     numrows_accesslogs
     codes_accesslogs
     insert_accesslogs
+    update_accesslogs
+    delete_accesslogs
     errorlogs
     numrows_errorlogs
     insert_errorlogs
@@ -31,6 +38,7 @@ our @EXPORT = qw{
     delete_errorlogs
     status_codes
     insert_status_codes
+    update_status_codes
     delete_status_codes
     get_id_status_codes
 };
@@ -82,11 +90,19 @@ id_logs integer PRIMARY KEY,
 log text,
 url text);
 
+drop table clients;
+CREATE TABLE clients (
+id integer PRIMARY KEY,
+client text);
+
 drop table domains;
 CREATE TABLE domains (
 id integer PRIMARY KEY,
 domain text,
-url text);
+fqdn text,
+image_url,
+client integer);
+
 
 ALTER TABLE domains ADD COLUMN url text;
 
@@ -173,11 +189,15 @@ sub insert_status_codes
 {
     my ($code, $title, $explanation, $rfc) = @_ ;
 
+    $title       =~ s/"/\"/g;
+    $explanation =~ s/"/\"/g;
+    $explanation =~ s/'/\'/g;
+
     if ( defined get_id_status_codes($code) ) 
     {
         # update
-        my $sth = database('sqlserver')->prepare(q/UPDATE status_codes SET code = ?, title = ?, explanation = ?, rfc = ? /);
-           $sth->execute( $code, $title,$explanation, $rfc ) or die "Cannot update status codes with code=$code";
+        my $sth = database('sqlserver')->prepare(q/UPDATE status_codes SET title = ?, explanation = ?, rfc = ? WHERE code = ?/);
+           $sth->execute( $title,$explanation, $rfc, $code ) or die "Cannot update status codes with code=$code";
            $sth->finish;
     }
     else 
@@ -215,36 +235,113 @@ sub delete_status_codes
     return 1; 
 }
 
+sub clients 
+{
+    return database('sqlserver')->selectall_arrayref( "SELECT * from clients order by client", { Slice => {} } );
+}
+
+sub insert_clients 
+{
+  my $client    = shift // '';
+  my $email     = shift // '';
+  
+  return 0 unless (length($client) != 0 );
+
+  my $qry = qq(INSERT INTO clients (client,email) VALUES (?,?);); 
+
+  my $sth = database('sqlserver')->prepare($qry);
+     $sth->execute("$client","$email") or die "Unable to insert.";
+     $sth->finish;
+
+  return 1; 
+}
+
+sub update_clients 
+{
+  my $id        = shift // 0;
+  my $client    = shift // '';
+  my $email     = shift // '';
+  
+  return 0 unless ($id);
+
+  my $qry = qq(UPDATE clients SET client=?,email=? WHERE id=?;); 
+
+  my $sth = database('sqlserver')->prepare($qry);
+     $sth->execute("$client","$email","$id") or die "Unable to update.";
+     $sth->finish;
+
+  return 1; 
+}
+
+sub delete_clients 
+{
+    my $id = shift // 0;
+
+    return 0 unless ($id != 0 );
+
+    my $qry = q/DELETE FROM clients WHERE id = ?;/; 
+
+    my $sth = database('sqlserver')->prepare($qry);
+    $sth->execute("$id") or die "Unable to delete.";
+    $sth->finish;
+
+    return 1; 
+}
+
+
+
+
 sub domains 
 {
-    return database('sqlserver')->selectall_arrayref( "SELECT * from domains order by domain", { Slice => {} } );
+    return database('sqlserver')->selectall_arrayref( "SELECT * from domains d LEFT JOIN clients c ON d.client=c.id order by client,domain", { Slice => {} } );
 }
 
 sub insert_domains 
 {
-  my $domain = shift // '';
+  my $domain    = shift // '';
+  my $fqdn      = shift // '';
+  my $image_url = shift // '';
 
   return 0 unless (length($domain) != 0 );
 
-  my $qry = qq(INSERT INTO domains (domain) VALUES (?);); 
+  my $qry = qq(INSERT INTO domains (domain,fqdn,image_url,client) VALUES (?,?,?,?);); 
 
   my $sth = database('sqlserver')->prepare($qry);
-    $sth->execute("$domain") or die "Unable to insert.";
-    $sth->finish;
+     $sth->execute("$domain","$fqdn","$image_url") or die "Unable to insert.";
+     $sth->finish;
+
+  return 1; 
+}
+
+sub update_domains 
+{
+  my $id        = shift // 0;
+  my $domain    = shift // '';
+  my $fqdn      = shift // '';
+  my $image_url = shift // '';
+  my $client    = shift // '';
+
+  return 0 unless ($id);
+
+  my $qry = qq(UPDATE domains SET domain=?,fqdn=?,image_url=?,client=? WHERE id=?;); 
+
+  my $sth = database('sqlserver')->prepare($qry);
+     $sth->execute("$domain","$fqdn","$image_url","$client","$id") or die "Unable to update.";
+     $sth->finish;
 
   return 1; 
 }
 
 sub delete_domains 
 {
-  my $domain = shift // '';
+  my $id = shift // 0;
 
-  return 0 unless (length($domain) != 0 );
+  return 0 unless ($id != 0 );
 
   my $qry = q/DELETE FROM domains WHERE id = ?;/; 
 
   my $sth = database('sqlserver')->prepare($qry);
-    $sth->execute("$domain") or die "Unable to delete.";
+    $sth->execute("$id") or die "Unable to delete.";
     $sth->finish;
 
     return 1; 
@@ -457,6 +554,46 @@ sub insert_accesslogs
 
     $alert->{type}    = 'success';
     $alert->{message} = 'Log data inserted into the database';
+
+    return $alert;
+}
+
+
+sub update_accesslogs 
+{
+    my @ids     = shift;
+    my $domain  = shift;
+    my $error   = 0;
+    my $alert;
+    my $i       = 0;
+      
+    my $qry = q/DELETE FROM access_log WHERE domain like ? and request = (SELECT request FROM error_log WHERE domain like ? and id = ?)/;
+    my $sth = database('sqlserver')->prepare($qry);
+        
+    if ( ref($ids[0]) ne 'ARRAY') {
+        eval { $sth->execute($domain,$domain,@ids) or die "Unable to update. id: @ids";};
+
+        if($@) { 
+            $error = 1;
+        }
+        $sth->finish;
+    }
+    else {
+        while ($ids[0][$i] > 0 ) 
+        {
+            eval { $sth->execute($domain,$domain,$ids[0][$i]) or die 'Unable to update. id: '.$ids[0][$i]; };
+
+            if($@) { 
+                $error = 1;
+            }
+            $sth->finish;
+            $i += 1;
+        } 
+    }
+    if ($error){
+        $alert->{type}    = 'warning';
+        $alert->{message} = "Unable to update an entry: $qry";
+    }    
 
     return $alert;
 }

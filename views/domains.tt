@@ -10,7 +10,6 @@
             <div class="col-md-2">
             </div>
             <div class="col-md-5">
-                
             </div>
             <div class="col-md-2 navbar-form navbar-right"> 
                 <button onclick="toggleSettings();" class="btn btn-info btn-md "><span class="glyphicon glyphicon-wrench"></span></button>
@@ -19,37 +18,60 @@
         </div> 
     </nav>
 
-    <!-- Main jumbotron  -->
-    <div class="jumbotron">
-        <div class="container" id="settings">
-            <div class="row">&nbsp;</div>
-            <div class="row">
-                <!-- add -->
-                <div class="col-md-4">
-                <form class="navbar-form" method="POST" action="[% request.uri_base %]/domains/add">
-                    <div class="form-group">
-                        <input type="text" name="name" class="input">
-                        <button type="submit" class="btn btn-success">Add&nbsp;&nbsp;</button>    
-                    </div>            
-                </form> 
+    <div id="jumbo">
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <!-- add -->
+            <div class="col-md-6">
+            <form name="add" id="add" class="navbar-form" method="POST" action="[% request.uri_base %]/domains/add">
+                <div class="form-group">
+                    <input type="text" name="domain" placeholder="Domain name (one word url friendly text)" class="input" size="50"><br>
+                    <input type="text" name="fqdn" placeholder="fqdn (http://...)" class="input" size="50"><br>
+                    <input type="text" name="image_url" placeholder="Image url" class="input" size="50">
+                    <button type="submit" class="btn btn-success">Add&nbsp;&nbsp;</button>    
+                </div>            
+            </form> 
+            </div>
+            <!-- delete -->
+            <div class="col-md-6">
+            <form class="navbar-form" method="POST" action="[% request.uri_base %]/domains/del">
+                <div class="form-group">
+                    <select name="delete" id="domain" class="form-control">
+                        <option value="domain"> Select</option>
+                        [% FOREACH dom in domains -%]
+                        <option value="[% dom.id %]">[% dom.id %]. [% dom.domain %]</option>
+                        [% END %]
+                    </select> 
                 </div>
-                <!-- delete -->
-                <div class="col-md-4">
-                <form class="navbar-form" method="POST" action="[% request.uri_base %]/domains/del">
-                    <div class="form-group">
-                        <select name="delete" id="domain" class="form-control">
-                            <option value="domain"> Select</option>
-                            [% FOREACH dom in domains -%]
-                            <option value="[% dom.id %]">[% dom.domain %]</option>
-                            [% END %]
-                        </select> 
-                    </div>
-                    <button type="submit" class="btn btn-danger">Delete</button>                
-                </form> 
-                </div>
+                <button type="submit" class="btn btn-danger">Delete</button>                
+            </form> 
             </div>
         </div>
     </div>
+    <!-- edit  --> 
+    <div id="edit">
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <div class="col-md-6">
+            <form name="edit" class="navbar-form" method="POST" action="[% request.uri_base %]/domains/update">
+                <div class="form-group">
+                    <input type="text" name="id" placeholder="ID" class="input" size="50"><br>
+                    <input type="text" name="domain" placeholder="Domain name" class="input" size="50"><br>
+                    <input type="text" name="fqdn"   placeholder="fqdn of the domain" class="input" size="50"><br>
+                    <input type="text" name="image_url" placeholder="Image url" class="input" size="50"><br>
+                    <select class="form-control" name="client">
+                    [% FOREACH client in clients -%]
+                        <option value="[% client.id %]" [% IF client.id == client %]selected[% END %]>[% client.id %]. [% client.client %] </option>
+                    [% END %]
+                    </select>
+                    <button type="submit" class="btn btn-success">Update&nbsp;&nbsp;</button>    
+                </div>            
+            </form> 
+            </div>
+        </div>
+    </div>
+
+    <h3>Domains</h3>
     
     [% IF alert.type == "success" %]<div class = "alert alert-success">[% alert.message %]</div>[% END %]
     [% IF alert.type == "info"    %]<div class = "alert alert-info"   >[% alert.message %]</div>[% END %]
@@ -57,18 +79,48 @@
     [% IF alert.type == "danger"  %]<div class = "alert alert-danger" >[% alert.message %]</div>[% END %]
     
     <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            <div><p><b>Domain Names</b></p></div>
-            <div class="form-group">
-                [% FOREACH dom in domains -%]
-                <div><p>[% dom.domain %]</p></div>
-                [% END %]    
-            </div>            
-            <br>
+        <div class="col-md-10">
+            <div class="row">
+                <div class="col-md-2">
+                    <b>Domain Name</b>
+                </div>
+                <div class="col-md-3">
+                    <b>FQDN</b>
+                </div>
+                <div class="col-md-3">
+                    <b>Image</b>
+                </div>
+                <div class="col-md-3">
+                    <b>Client</b>
+                </div>
+                <div class="col-md-1">
+                    <b>Edit</b>
+                </div>
+            </div>
+            [% FOREACH dom in domains -%]
+            <div class="row">
+                <div class="col-md-2">
+                    [% dom.domain %]
+                </div>
+                <div class="col-md-3">
+                    [% dom.fqdn %]
+                </div>
+                <div class="col-md-3">
+                    [% dom.image_url %]
+                </div>
+                <div class="col-md-3">
+                    [% dom.client %]
+                </div>
+                <div class="col-md-1">
+                    <button onclick='editThis("[% dom.id %]","[% dom.domain %]","[% dom.fqdn %]","[% dom.image_url %]","[% dom.client %]")' class="btn btn-xs btn-info">
+                        <span class="glyphicon glyphicon-edit"></span>
+                    </button>  
+                </div>
+            </div>
+            [% END %]    
         </div>
-        <div class="col-md-1"></div>
-        <div class="col-md-3">
-            <div><p><b>Logfiles</b></p></div>
+        <div class="col-md-2 aliceblue">
+            <div><br><b>Logfiles</b></div>
             <div class="form-group">
                 [% FOREACH dir in dirs -%]
                 <div><p>[% dir %]</p></div>
@@ -82,13 +134,34 @@
 
 <script type="text/javascript">
 
-    /* settings */
+    function editThis(){
+        var id       = arguments[0];
+        var domain   = arguments[1];
+        var fqdn     = arguments[2];
+        var image_url= arguments[3];
+        var client   = arguments[4];
+      
+        var j = document.getElementById('jumbo');
+        j.style.display = 'none';  
+        var e = document.getElementById('edit');
+        e.style.display = 'block';
+        document.forms["edit"]["id"].value        = id;
+        document.forms["edit"]["domain"].value    = domain;
+        document.forms["edit"]["fqdn"].value      = fqdn;
+        document.forms["edit"]["image_url"].value = image_url;
+        document.forms["edit"]["client"].value    = client;
+    }
+
+    /* hide jumbo section */
     function toggleSettings() {
-        var e = document.getElementById('settings');
-        if (e.style.display === 'none' || e.style.display === '') {
-            e.style.display = 'block';
+        var e = document.getElementById('edit');
+        e.style.display = 'none';
+
+        var j = document.getElementById('jumbo');
+        if (j.style.display === 'none' || j.style.display === '') {
+            j.style.display = 'block';
         } else {
-            e.style.display = 'none';
+            j.style.display = 'none';
         }
     }
 

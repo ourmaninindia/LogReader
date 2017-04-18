@@ -1,0 +1,139 @@
+[% INCLUDE layouts/header.tt %]
+<div class="container">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="../">LogReader</a>
+                </div>
+            </div>
+            <div class="col-md-7"></div>
+            <div class="col-md-2 navbar-form navbar-right"> 
+                <button onclick="toggleSettings();" class="btn btn-info btn-md "><span class="glyphicon glyphicon-wrench"></span></button>
+                &nbsp;&nbsp;&nbsp;
+            </div>
+        </div> 
+    </nav>
+    <div class="spacing"></div>
+    <!-- add/delete  -->
+    <div id="jumbo">
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <!-- add -->
+            <div class="col-md-6">
+                <form name="add" id="add" class="navbar-form" method="POST" action="[% request.uri_base %]/clients/add">
+                    <div class="form-group">
+                        <input type="text" name="client" placeholder="Client name" class="input" size="50"><br>
+                        <input type="text" name="email" placeholder="Email address" class="input" size="50"><br>
+                        <button type="submit" class="btn btn-success">Add&nbsp;&nbsp;</button>    
+                    </div>            
+                </form> 
+            </div>
+            <!-- delete -->
+            <div class="col-md-6">
+                <form class="navbar-form" method="POST" action="[% request.uri_base %]/clients/del">
+                    <div class="form-group">
+                        <select name="delete" class="form-control">
+                            <option value="client"> Select</option>
+                            [% FOREACH client in clients -%]
+                            <option value="[% client.id %]">[% client.client %]</option>
+                            [% END %]
+                        </select> 
+                    </div>
+                    <button type="submit" class="btn btn-danger">Delete</button>                
+                </form> 
+            </div>
+        </div>
+    </div>
+   
+    <!-- edit  --> 
+    <div id="edit">
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <div class="col-md-6">
+            <form name="edit" class="navbar-form" method="POST" action="[% request.uri_base %]/clients/update">
+                <div class="form-group">
+                    <input type="text" name="id" placeholder="ID" class="input" size="50"><br>
+                    <input type="text" name="client" placeholder="Client name" class="input" size="50"><br>
+                    <input type="text" name="email" placeholder="Email address" class="input" size="50"><br>
+                    <button type="submit" class="btn btn-success">Update&nbsp;&nbsp;</button>    
+                </div>            
+            </form> 
+            </div>
+        </div>
+    </div>
+    
+
+    <h3>Clients</h3>
+    
+    [% IF alert.type == "success" %]<div class = "alert alert-success">[% alert.message %]</div>[% END %]
+    [% IF alert.type == "info"    %]<div class = "alert alert-info"   >[% alert.message %]</div>[% END %]
+    [% IF alert.type == "warning" %]<div class = "alert alert-warning">[% alert.message %]</div>[% END %]
+    [% IF alert.type == "danger"  %]<div class = "alert alert-danger" >[% alert.message %]</div>[% END %]
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="row">
+                <div class="col-md-1">
+                    <b>ID</b>
+                </div>
+                <div class="col-md-3">
+                    <b>Client Name</b>
+                </div>
+                <div class="col-md-4">
+                    <b>Email</b>
+                </div>
+            </div>
+            [% FOREACH client in clients -%]
+            <div class="row">
+                <div class="col-md-1">
+                    [% client.id %]
+                </div>
+                <div class="col-md-3">
+                    [% client.client %]
+                </div>
+                 <div class="col-md-4">
+                    [% client.email %]
+                </div>
+                <div class="col-md-1">
+                    <button onclick='editThis("[% client.id %]","[% client.client %]","[% client.email %]");' class="btn btn-xs btn-info"><span class="glyphicon glyphicon-edit"></span></button>  
+                </div>
+            </div>
+            [% END %]    
+        </div>
+    </div>
+</div>
+[% INCLUDE layouts/footer.tt %]    
+
+<script type="text/javascript">
+
+    function editThis(){
+        var id      = arguments[0];
+        var client  = arguments[1];
+        var email   = arguments[2];
+      
+        var j = document.getElementById('jumbo');
+        j.style.display = 'none';  
+        var e = document.getElementById('edit');
+        e.style.display = 'block';
+        document.forms["edit"]["id"    ].value = id;
+        document.forms["edit"]["client"].value = client;
+        document.forms["edit"]["email" ].value = email;
+    }
+
+    /* hide jumbo section */
+    function toggleSettings() {
+        var e = document.getElementById('edit');
+        e.style.display = 'none';
+
+        var j = document.getElementById('jumbo');
+        if (j.style.display === 'none' || j.style.display === '') {
+            j.style.display = 'block';
+        } else {
+            j.style.display = 'none';
+        }
+    }
+
+</script>
+</body>
+</html>

@@ -5,7 +5,7 @@
     .container {width:auto;}
     p {color: antiquewhite;}
     .list{ list-style: none;}
-    li{margin: 15px 0; font-size: 19px; margin-top: 50px;}
+    li{margin: 15px 0; font-size: 19px; margin-top: 10px;}
     a, h1 {color: lightgray;}
     li a.active {color: #252830;
     cursor: default;
@@ -15,6 +15,7 @@
     padding: 7px 15px;}
     .sidebar {margin-right:20px;}
 </style>
+
     <div class="container">
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="row">
@@ -43,12 +44,14 @@
                 <div class="sidebar">
                     <ul class="list">    
                         <li><a href="../" class="active">Dashboard</a></li>
-                        <li><a href="../domains">Domains</a></li>
                         <li><a href="../access/domain/000">Access Logs</a></li>
                         <li><a href="../error/domain/000">Error Logs</a></li>
                         <li><a href="../bots">Bots</a></li>
-                         <li><a href="../logs">Logs</a></li>
-                         <li><a href="../status-codes">Status Codes</a></li>
+                        <li><a href="../logs">Log Types</a></li>
+                        <li><a href="../status-codes">Status Codes</a></li>
+                        <li><a href="../domains">Domains</a></li>
+                        <li><a href="../clients">Clients</a></li>
+                        <li><a href="http://admin.traveljadoo.com" target="_blank">Admin wiki </a></li>
                         <li><a href="http://getbootstrap.com/components/" target="_blank">Bootstrap</a></li>
                         <li><a href="#">[% sess %]</a></li>
                     </ul>
@@ -57,8 +60,25 @@
             <div class="col-md-9">
                 <h1>Dashboard</h1>
                 <hr>
+
+<!-- The Sign-in button. This will run `queryReports()` on success. 
+<div class="g-signin2" data-onsuccess="queryReports"></div>
+<textarea cols="80" rows="20" id="query-output"></textarea>
+-->
                 <div class="row">
-                [% FOREACH dom in domains -%]<div class="col-md-3"><p>[% dom.domain %]</p></div>[% END %]
+                    [% FOREACH dom in domains -%]
+                    <div class="col-md-3  domains">
+                        <div>
+                            <img src="../images/[% dom.image_url %]" alt="home page">
+                        </div>
+                        <div>
+                            <a href="[% dom.fqdn %]" target="_blank">[% dom.domain %]</a>
+                        </div>
+                        <div class="[% IF dom.up == 1 %]greenbg[% ELSE %]redbg[% END %]">
+                            [% IF dom.up == 1 %]up[% ELSE %]down[% END %] 
+                        </div>
+                    </div>
+                    [% END %]
                 </div>
             </div>
         </div>
@@ -77,6 +97,45 @@
         }
     }
 
-    </script>
+
+  // Replace with your view ID.
+  var VIEW_ID = '105751714';
+
+  // Query the API and print the results to the page.
+  function queryReports() {
+    gapi.client.request({
+      path: '/v4/reports:batchGet',
+      root: 'https://analyticsreporting.googleapis.com/',
+      method: 'POST',
+      body: {
+        reportRequests: [
+          {
+            viewId: VIEW_ID,
+            dateRanges: [
+              {
+                startDate: '7daysAgo',
+                endDate: 'today'
+              }
+            ],
+            metrics: [
+              {
+                expression: 'ga:sessions'
+              }
+            ]
+          }
+        ]
+      }
+    }).then(displayResults, console.error.bind(console));
+  }
+
+  function displayResults(response) {
+    var formattedJson = JSON.stringify(response.result, null, 2);
+    document.getElementById('query-output').value = formattedJson;
+  }
+</script>
+
+<!-- Load the JavaScript API client and Sign-in library. -->
+<script src="https://apis.google.com/js/client:platform.js"></script>
+
 </body>
 </html>
