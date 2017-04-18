@@ -299,16 +299,17 @@ sub domains
 
 sub insert_domains 
 {
-  my $domain    = shift // '';
-  my $fqdn      = shift // '';
-  my $image_url = shift // '';
+    my $domain    = shift // '';
+    my $fqdn      = shift // '';
+    my $image_url = shift // '';
+    my $client    = shift // 0;
 
   return 0 unless (length($domain) != 0 );
 
   my $qry = qq(INSERT INTO domains (domain,fqdn,image_url,client) VALUES (?,?,?,?);); 
 
   my $sth = database('sqlserver')->prepare($qry);
-     $sth->execute("$domain","$fqdn","$image_url") or die "Unable to insert.";
+     $sth->execute("$domain","$fqdn","$image_url",$client) or die "Unable to insert.";
      $sth->finish;
 
   return 1; 
