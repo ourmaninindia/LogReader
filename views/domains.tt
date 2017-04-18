@@ -30,7 +30,7 @@
                     <input type="text" name="image_url" placeholder="Image url" class="input" size="50"><br>
                     <select class="form-control" name="clients_id">
                     [% FOREACH client in clients -%]
-                        <option value="[% client.clients_id %]" [% IF client.clients_id == client %]selected[% END %]>[% client.clients_id %]. [% client.client %] </option>
+                        <option value="[% client.clients_id %]" [% IF client.clients_id == clients_id %]selected[% END %]>[% client.clients_id %]. [% client.client %] </option>
                     [% END %]
                     </select>
                     <button type="submit" class="btn btn-success">Add&nbsp;&nbsp;</button>    

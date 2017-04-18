@@ -114,15 +114,15 @@ post '/domains/:option' => sub
 {
 	if (params->{option} eq 'add')
 	{ 
-		my $ok = insert_domains(params->{domain},params->{fqdn},params->{image_url});
+		insert_domains(params->{domain},params->{fqdn},params->{image_url},params->{clients_id});
 	} 
 	elsif (params->{option} eq 'del')
 	{ 
-		my $ok = delete_domains(params->{domains_id});
+		delete_domains(params->{domains_id});
 	}
 	elsif (params->{option} eq 'update')
 	{
-		my $ok = update_domains(params->{domains_id},params->{domain},params->{fqdn},params->{image_url},params->{clients_id});
+		update_domains(params->{domains_id},params->{domain},params->{fqdn},params->{image_url},params->{clients_id});
 	}
 
 	redirect '../domains';

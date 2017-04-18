@@ -503,14 +503,14 @@ sub update_domains
 
 sub delete_domains 
 {
-    my $id = shift // 0;
+    my $domains_id = shift // 0;
 
-    return 0 unless ($id != 0 );
+    return 0 unless ($domains_id != 0 );
 
     my $qry = q/DELETE FROM domains WHERE domains_id = ?;/; 
 
     my $sth = database('sqlserver')->prepare($qry);
-    $sth->execute("$id") or die "Unable to delete.";
+    $sth->execute($domains_id) or die "Unable to delete.";
     $sth->finish;
 
     return 1; 
