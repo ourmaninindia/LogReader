@@ -11,8 +11,9 @@ use Data::Dumper;
 use POSIX qw/ceil/;
 use Time::Local;
 use Socket;
-#use LWP::Simple qw/head/;
 use LWP::UserAgent;
+use LWP::Protocol::https;
+
 use open qw(:std :utf8);
 
 our $VERSION 		 = '0.1';
@@ -40,8 +41,6 @@ get '/' => sub
 
 		if ( defined($url)>0 ) {
 			my $response = $ua->head($url);
-			debug $url;
-			debug to_dumper($response);
 
 			if ( $response->is_success ) {
 				$domains[0][$i]->{up} = 1; 
@@ -119,11 +118,11 @@ post '/domains/:option' => sub
 	} 
 	elsif (params->{option} eq 'del')
 	{ 
-		my $ok = delete_domains(params->{delete});
+		my $ok = delete_domains(params->{domains_id});
 	}
 	elsif (params->{option} eq 'update')
 	{
-		my $ok = update_domains(params->{id},params->{domain},params->{fqdn},params->{image_url},params->{client});
+		my $ok = update_domains(params->{domains_id},params->{domain},params->{fqdn},params->{image_url},params->{clients_id});
 	}
 
 	redirect '../domains';

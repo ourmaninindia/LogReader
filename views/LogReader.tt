@@ -10,7 +10,7 @@
             <div class="col-md-3">&nbsp;</div>
             <div class="col-md-3">
                 <div id="navbar" class="navbar-collapse collapse">
-                    <form class="navbar-form navbar-right" method="POST" action="[% request.uri_base %]/error/domain">                    
+                    <form class="navbar-form navbar-right" method="POST" action="[% request.uri_base %]/error/domain">
                         <div class="form-group">
                             <select name="domain" id="domain" class="form-control">
                                 <option value="domain">Select</option>

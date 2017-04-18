@@ -90,30 +90,30 @@ id_logs integer PRIMARY KEY,
 log text,
 url text);
 
+ALTER TABLE domains ADD COLUMN url text;
+
+
 drop table clients;
 CREATE TABLE clients (
-id integer PRIMARY KEY,
+clients_id integer PRIMARY KEY,
 client text,
 email text);
 
 drop table domains;
 CREATE TABLE domains (
-id integer PRIMARY KEY,
+domains_id integer PRIMARY KEY,
 domain text,
 fqdn text,
 image_url,
-client integer);
-
-
-ALTER TABLE domains ADD COLUMN url text;
+clients_id integer);
 
 drop table bots;
 CREATE TABLE bots (
- id integer PRIMARY KEY,
- ua text,
- ip text,
- datum integer NOT NULL,
- spam integer);
+bots_id integer PRIMARY KEY,
+ua text,
+ip text,
+datum integer NOT NULL,
+spam integer);
 
 
 Sort access by Response Codes
@@ -130,260 +130,7 @@ awk -F\" '($2 ~ "ref"){print $2}' access.log | awk '{print $2}' | sort | uniq -c
 
 
 =cut
-sub bots 
-{
-    return database('sqlserver')->selectall_arrayref( "SELECT * from bots order by id", { Slice => {} } );
-}
 
-sub get_id_bots 
-{
-    my $ip = shift // 'no ip';
-
-    my $sth = database('sqlserver')->prepare(q/SELECT id from bots where ip like ?/);
-       $sth->execute($ip);
-    my $id = $sth->fetchrow_arrayref;
-       $sth->finish;
-    return $id;
-}
-
-sub insert_bots 
-{
-    my ($ua, $ip, $spam) = @_ ;
-
-    if ( defined get_id_bots($ip) ) 
-    {
-        # update
-        my $sth = database('sqlserver')->prepare(q/UPDATE bots SET datum = ?, spam = ? /);
-           $sth->execute( time(), $spam ) or die "Cannot update bots with ip=$ip";
-           $sth->finish;
-    }
-    else 
-    {
-        if (length $ip > 0) {
-            # insert
-            my $sth = database('sqlserver')->prepare(q/INSERT INTO bots (ua,ip,datum,spam) VALUES (?,?,?,?);/);
-               $sth->execute( $ua,$ip,time(),$spam );
-               $sth->finish;
-        }
-    }
-    return
-}
-
-sub delete_bots 
-{
-    my $id = shift // 0;
-
-    return 0 unless ($id > 0 );
-
-    my $sth = database('sqlserver')->prepare(q/DELETE FROM bots WHERE id = ?;/);
-    $sth->execute($id) or die "Unable to delete.";
-    $sth->finish;
-    return 1; 
-}
-
-sub status_codes 
-{
-    return database('sqlserver')->selectall_arrayref( "SELECT * from status_codes order by code", { Slice => {} } );
-}
-
-sub insert_status_codes 
-{
-    my ($code, $title, $explanation, $rfc) = @_ ;
-
-    $title       =~ s/"/\"/g;
-    $explanation =~ s/"/\"/g;
-    $explanation =~ s/'/\'/g;
-
-    if ( defined get_id_status_codes($code) ) 
-    {
-        # update
-        my $sth = database('sqlserver')->prepare(q/UPDATE status_codes SET title = ?, explanation = ?, rfc = ? WHERE code = ?/);
-           $sth->execute( $title,$explanation, $rfc, $code ) or die "Cannot update status codes with code=$code";
-           $sth->finish;
-    }
-    else 
-    {
-        if (length $code > 0) {
-            # insert
-            my $sth = database('sqlserver')->prepare(q/INSERT INTO status_codes (code, title, explanation, rfc) VALUES (?,?,?,?);/);
-               $sth->execute( $code, $title,$explanation, $rfc );
-               $sth->finish;
-        }
-    }
-    return
-}
-
-sub get_id_status_codes 
-{
-    my $code = shift // 'no code';
-
-    my $sth = database('sqlserver')->prepare(q/SELECT id from status_codes where code = ?/);
-       $sth->execute($code);
-    my $id = $sth->fetchrow_arrayref;
-       $sth->finish;
-    return $id;
-}
-
-sub delete_status_codes 
-{
-    my $id = shift // 0;
-
-    return 0 unless ($id > 0 );
-
-    my $sth = database('sqlserver')->prepare(q/DELETE FROM status_codes WHERE id = ?;/);
-    $sth->execute($id) or die "Unable to delete.";
-    $sth->finish;
-    return 1; 
-}
-
-sub clients 
-{
-    return database('sqlserver')->selectall_arrayref( "SELECT * from clients order by client", { Slice => {} } );
-}
-
-sub insert_clients 
-{
-  my $client    = shift // '';
-  my $email     = shift // '';
-  
-  return 0 unless (length($client) != 0 );
-
-  my $qry = qq(INSERT INTO clients (client,email) VALUES (?,?);); 
-
-  my $sth = database('sqlserver')->prepare($qry);
-     $sth->execute("$client","$email") or die "Unable to insert.";
-     $sth->finish;
-
-  return 1; 
-}
-
-sub update_clients 
-{
-  my $id        = shift // 0;
-  my $client    = shift // '';
-  my $email     = shift // '';
-  
-  return 0 unless ($id);
-
-  my $qry = qq(UPDATE clients SET client=?,email=? WHERE id=?;); 
-
-  my $sth = database('sqlserver')->prepare($qry);
-     $sth->execute("$client","$email","$id") or die "Unable to update.";
-     $sth->finish;
-
-  return 1; 
-}
-
-sub delete_clients 
-{
-    my $id = shift // 0;
-
-    return 0 unless ($id != 0 );
-
-    my $qry = q/DELETE FROM clients WHERE id = ?;/; 
-
-    my $sth = database('sqlserver')->prepare($qry);
-    $sth->execute("$id") or die "Unable to delete.";
-    $sth->finish;
-
-    return 1; 
-}
-
-
-
-
-sub domains 
-{
-    return database('sqlserver')->selectall_arrayref( "SELECT * from domains d LEFT JOIN clients c ON d.client=c.id order by client,domain", { Slice => {} } );
-}
-
-sub insert_domains 
-{
-    my $domain    = shift // '';
-    my $fqdn      = shift // '';
-    my $image_url = shift // '';
-    my $client    = shift // 0;
-
-  return 0 unless (length($domain) != 0 );
-
-  my $qry = qq(INSERT INTO domains (domain,fqdn,image_url,client) VALUES (?,?,?,?);); 
-
-  my $sth = database('sqlserver')->prepare($qry);
-     $sth->execute("$domain","$fqdn","$image_url",$client) or die "Unable to insert.";
-     $sth->finish;
-
-  return 1; 
-}
-
-sub update_domains 
-{
-  my $id        = shift // 0;
-  my $domain    = shift // '';
-  my $fqdn      = shift // '';
-  my $image_url = shift // '';
-  my $client    = shift // '';
-
-  return 0 unless ($id);
-
-  my $qry = qq(UPDATE domains SET domain=?,fqdn=?,image_url=?,client=? WHERE id=?;); 
-
-  my $sth = database('sqlserver')->prepare($qry);
-     $sth->execute("$domain","$fqdn","$image_url","$client","$id") or die "Unable to update.";
-     $sth->finish;
-
-  return 1; 
-}
-
-sub delete_domains 
-{
-  my $id = shift // 0;
-
-  return 0 unless ($id != 0 );
-
-  my $qry = q/DELETE FROM domains WHERE id = ?;/; 
-
-  my $sth = database('sqlserver')->prepare($qry);
-    $sth->execute("$id") or die "Unable to delete.";
-    $sth->finish;
-
-    return 1; 
-}
-
-sub logs 
-{
-    return database('sqlserver')->selectall_arrayref( "SELECT * FROM logs ORDER BY log", { Slice => {} } );
-}
-
-sub insert_logs 
-{
-  my $log = shift // '';
-  my $url = shift // '';
-
-  return 0 unless (length($log) != 0 );
-
-  my $qry = q/INSERT INTO logs (log,url) VALUES (?,?);/; 
-
-  my $sth = database('sqlserver')->prepare($qry);
-    $sth->execute("$log","$url") or die "Unable to insert.";
-    $sth->finish;
-
-  return 1; 
-}
-
-sub delete_logs 
-{
-    my $log = shift // '';
-
-    return 0 unless (length($log) != 0 );
-
-    my $qry = q/DELETE FROM logs WHERE id_logs = ?;/; 
-
-    my $sth = database('sqlserver')->prepare($qry);
-    $sth->execute("$log") or die "Unable to delete.";
-    $sth->finish;
-
-    return 1; 
-}
 
 sub accesslogs 
 {
@@ -425,6 +172,7 @@ sub accesslogs
 
     return database('sqlserver')->selectall_arrayref( $qry, { Slice => {} } );
 }
+
 
 sub numrows_accesslogs 
 {
@@ -599,6 +347,176 @@ sub update_accesslogs
 
     return $alert;
 }
+
+
+
+sub bots 
+{
+    return database('sqlserver')->selectall_arrayref( "SELECT * from bots order by bots_id", { Slice => {} } );
+}
+
+sub get_id_bots 
+{
+    my $ip = shift // 'no ip';
+
+    my $sth = database('sqlserver')->prepare(q/SELECT bots_id from bots where ip like ?/);
+       $sth->execute($ip);
+    my $id = $sth->fetchrow_arrayref;
+       $sth->finish;
+    return $id;
+}
+
+sub insert_bots 
+{
+    my ($ua, $ip, $spam) = @_ ;
+
+    if ( defined get_id_bots($ip) ) 
+    {
+        # update
+        my $sth = database('sqlserver')->prepare(q/UPDATE bots SET datum = ?, spam = ? /);
+           $sth->execute( time(), $spam ) or die "Cannot update bots with ip=$ip";
+           $sth->finish;
+    }
+    else 
+    {
+        if (length $ip > 0) {
+            # insert
+            my $sth = database('sqlserver')->prepare(q/INSERT INTO bots (ua,ip,datum,spam) VALUES (?,?,?,?);/);
+               $sth->execute( $ua,$ip,time(),$spam );
+               $sth->finish;
+        }
+    }
+    return
+}
+
+sub delete_bots 
+{
+    my $id = shift // 0;
+
+    return 0 unless ($id > 0 );
+
+    my $sth = database('sqlserver')->prepare(q/DELETE FROM bots WHERE id = ?;/);
+    $sth->execute($id) or die "Unable to delete.";
+    $sth->finish;
+    return 1; 
+}
+
+
+
+sub clients 
+{
+    return database('sqlserver')->selectall_arrayref( "SELECT * from clients order by client", { Slice => {} } );
+}
+
+sub insert_clients 
+{
+  my $client    = shift // '';
+  my $email     = shift // '';
+  
+  return 0 unless (length($client) != 0 );
+
+  my $qry = qq(INSERT INTO clients (client,email) VALUES (?,?);); 
+
+  my $sth = database('sqlserver')->prepare($qry);
+     $sth->execute("$client","$email") or die "Unable to insert.";
+     $sth->finish;
+
+  return 1; 
+}
+
+sub update_clients 
+{
+  my $id        = shift // 0;
+  my $client    = shift // '';
+  my $email     = shift // '';
+  
+  return 0 unless ($id);
+
+  my $qry = qq(UPDATE clients SET client=?,email=? WHERE clients_id=?;); 
+
+  my $sth = database('sqlserver')->prepare($qry);
+     $sth->execute("$client","$email",$id) or die "Unable to update.";
+     $sth->finish;
+
+  return 1; 
+}
+
+sub delete_clients 
+{
+    my $id = shift // 0;
+
+    return 0 unless ($id != 0 );
+
+    my $qry = q/DELETE FROM clients WHERE clients_id = ?;/; 
+
+    my $sth = database('sqlserver')->prepare($qry);
+    $sth->execute($id) or die "Unable to delete.";
+    $sth->finish;
+
+    return 1; 
+}
+
+
+
+
+sub domains 
+{
+    return database('sqlserver')->selectall_arrayref( "SELECT * FROM domains d LEFT JOIN clients c ON d.clients_id=c.clients_id order by client,domain", { Slice => {} } );
+}
+
+sub insert_domains 
+{
+    my $domain     = shift // '';
+    my $fqdn       = shift // '';
+    my $image_url  = shift // '';
+    my $clients_id = shift // 0;
+
+  return 0 unless (length($domain) != 0 );
+
+  my $qry = qq(INSERT INTO domains (domain,fqdn,image_url,clients_id) VALUES (?,?,?,?);); 
+
+  my $sth = database('sqlserver')->prepare($qry);
+     $sth->execute("$domain","$fqdn","$image_url",$clients_id) or die "Unable to insert.";
+     $sth->finish;
+
+  return 1; 
+}
+
+sub update_domains 
+{
+  my $id         = shift // 0;
+  my $domain     = shift // '';
+  my $fqdn       = shift // '';
+  my $image_url  = shift // '';
+  my $clients_id = shift // '';
+
+  return 0 unless ($id);
+
+  my $qry = q/UPDATE domains SET domain=?,fqdn=?,image_url=?,clients_id=? WHERE domains_id=?;/; 
+
+  my $sth = database('sqlserver')->prepare($qry);
+     $sth->execute("$domain","$fqdn","$image_url",$clients_id,$id) or die "Unable to update.";
+     $sth->finish;
+
+  return 1; 
+}
+
+sub delete_domains 
+{
+    my $id = shift // 0;
+
+    return 0 unless ($id != 0 );
+
+    my $qry = q/DELETE FROM domains WHERE domains_id = ?;/; 
+
+    my $sth = database('sqlserver')->prepare($qry);
+    $sth->execute("$id") or die "Unable to delete.";
+    $sth->finish;
+
+    return 1; 
+}
+
+
 
 sub errorlogs 
 {
@@ -858,6 +776,102 @@ sub delete_errorlogs
     $alert->{message} = "Log data up to $date has been deleted from the database.";
 
     return $alert;
+}
+
+
+
+
+sub logs 
+{
+    return database('sqlserver')->selectall_arrayref( "SELECT * FROM logs ORDER BY log", { Slice => {} } );
+}
+
+sub insert_logs 
+{
+  my $log = shift // '';
+  my $url = shift // '';
+
+  return 0 unless (length($log) != 0 );
+
+  my $qry = q/INSERT INTO logs (log,url) VALUES (?,?);/; 
+
+  my $sth = database('sqlserver')->prepare($qry);
+    $sth->execute("$log","$url") or die "Unable to insert.";
+    $sth->finish;
+
+  return 1; 
+}
+
+sub delete_logs 
+{
+    my $log = shift // '';
+
+    return 0 unless (length($log) != 0 );
+
+    my $qry = q/DELETE FROM logs WHERE id_logs = ?;/; 
+
+    my $sth = database('sqlserver')->prepare($qry);
+    $sth->execute("$log") or die "Unable to delete.";
+    $sth->finish;
+
+    return 1; 
+}
+
+
+
+sub status_codes 
+{
+    return database('sqlserver')->selectall_arrayref( "SELECT * from status_codes order by code", { Slice => {} } );
+}
+
+sub insert_status_codes 
+{
+    my ($code, $title, $explanation, $rfc) = @_ ;
+
+    $title       =~ s/"/\"/g;
+    $explanation =~ s/"/\"/g;
+    $explanation =~ s/'/\'/g;
+
+    if ( defined get_id_status_codes($code) ) 
+    {
+        # update
+        my $sth = database('sqlserver')->prepare(q/UPDATE status_codes SET title = ?, explanation = ?, rfc = ? WHERE code = ?/);
+           $sth->execute( $title,$explanation, $rfc, $code ) or die "Cannot update status codes with code=$code";
+           $sth->finish;
+    }
+    else 
+    {
+        if (length $code > 0) {
+            # insert
+            my $sth = database('sqlserver')->prepare(q/INSERT INTO status_codes (code, title, explanation, rfc) VALUES (?,?,?,?);/);
+               $sth->execute( $code, $title,$explanation, $rfc );
+               $sth->finish;
+        }
+    }
+    return
+}
+
+sub get_id_status_codes 
+{
+    my $code = shift // 'no code';
+
+    my $sth = database('sqlserver')->prepare(q/SELECT id from status_codes where code = ?/);
+       $sth->execute($code);
+    my $id = $sth->fetchrow_arrayref;
+       $sth->finish;
+    return $id;
+}
+
+sub delete_status_codes 
+{
+    my $id = shift // 0;
+
+    return 0 unless ($id > 0 );
+
+    my $sth = database('sqlserver')->prepare(q/DELETE FROM status_codes WHERE id = ?;/);
+    $sth->execute($id) or die "Unable to delete.";
+    $sth->finish;
+    return 1; 
 }
 
 

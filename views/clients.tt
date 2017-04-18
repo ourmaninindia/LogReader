@@ -36,7 +36,7 @@
                         <select name="delete" class="form-control">
                             <option value="client"> Select</option>
                             [% FOREACH client in clients -%]
-                            <option value="[% client.id %]">[% client.client %]</option>
+                            <option value="[% client.clients_id %]">[% client.client %]</option>
                             [% END %]
                         </select> 
                     </div>
@@ -53,7 +53,7 @@
             <div class="col-md-6">
             <form name="edit" class="navbar-form" method="POST" action="[% request.uri_base %]/clients/update">
                 <div class="form-group">
-                    <input type="text" name="id" placeholder="ID" class="input" size="50"><br>
+                    <input type="text" name="clients_id" placeholder="ID" class="input" size="50"><br>
                     <input type="text" name="client" placeholder="Client name" class="input" size="50"><br>
                     <input type="text" name="email" placeholder="Email address" class="input" size="50"><br>
                     <button type="submit" class="btn btn-success">Update&nbsp;&nbsp;</button>    
@@ -87,7 +87,7 @@
             [% FOREACH client in clients -%]
             <div class="row">
                 <div class="col-md-1">
-                    [% client.id %]
+                    [% client.clients_id %]
                 </div>
                 <div class="col-md-3">
                     [% client.client %]
@@ -96,7 +96,7 @@
                     [% client.email %]
                 </div>
                 <div class="col-md-1">
-                    <button onclick='editThis("[% client.id %]","[% client.client %]","[% client.email %]");' class="btn btn-xs btn-info"><span class="glyphicon glyphicon-edit"></span></button>  
+                    <button onclick='editThis("[% client.clients_id %]","[% client.client %]","[% client.email %]");' class="btn btn-xs btn-info"><span class="glyphicon glyphicon-edit"></span></button>  
                 </div>
             </div>
             [% END %]    
@@ -108,7 +108,7 @@
 <script type="text/javascript">
 
     function editThis(){
-        var id      = arguments[0];
+        var clients_id = arguments[0];
         var client  = arguments[1];
         var email   = arguments[2];
       
@@ -116,7 +116,7 @@
         j.style.display = 'none';  
         var e = document.getElementById('edit');
         e.style.display = 'block';
-        document.forms["edit"]["id"    ].value = id;
+        document.forms["edit"]["clients_id"].value = clients_id;
         document.forms["edit"]["client"].value = client;
         document.forms["edit"]["email" ].value = email;
     }
