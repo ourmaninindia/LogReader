@@ -352,16 +352,15 @@ sub update_accesslogs
 
 sub bots 
 {
-    return database('sqlserver')->selectall_arrayref( "SELECT * from bots order by bots_id", { Slice => {} } );
+    return database('sqlserver')->selectall_arrayref( "SELECT strftime('%d-%m-%Y',date(datum,'unixepoch')) as eudate, * from bots order by bots_id", { Slice => {} } );
 }
 
 sub get_id_bots 
 {
-    my $ip = shift // 'no ip';
-
+    my $ip  = shift // 'no ip';
     my $sth = database('sqlserver')->prepare(q/SELECT bots_id from bots where ip like ?/);
        $sth->execute($ip);
-    my $id = $sth->fetchrow_arrayref;
+    my $id  = $sth->fetchrow_arrayref;
        $sth->finish;
     return $id;
 }

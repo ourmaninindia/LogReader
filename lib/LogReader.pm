@@ -53,11 +53,108 @@ get '/' => sub
     };
 };
 
-get 'dns/:ip' => sub 
+post '/access/domain' => sub 
 {
-	my $host = gethostbyaddr(inet_aton(params->{ip}),AF_INET) // 'not found'; 
-	insert_bots($host,params->{ip}) unless (index($host,'bot') == -1 || index($host,'spider') == -1);
-    return $host;
+	redirect '../access/'.params->{domain}.'/000';
+};
+
+any [ 'get', 'post' ] => '/access/*/**' => sub 
+{ 
+	# variables passed
+	my ( $domain, $arg ) = splat;
+	my $filterurl 	= @{$arg}[0] // '000';
+   	my $pageno 		= @{$arg}[1] // 0;
+	my $fix    		= @{$arg}[2] // 0;
+	
+   	# declarations
+	my $lastpage    = 1;
+	my @data 		= ();
+	my $alert 		= '';
+	my $message		= '';
+	my $rows        = 0;
+	my $xImage 		= 0;
+	my $xBot 		= 0;
+	my $xStatus 	= 0;
+
+	if ($filterurl eq 'filter')	{
+		$xImage 	= substr($pageno,0,1) // 0 ;
+		$xBot 		= substr($pageno,1,1) // 0 ;
+		$xStatus 	= substr($pageno,2,3) // 0 ;
+		$pageno 	= 1;
+		$filterurl 	= "$xImage$xBot$xStatus"; 
+	};
+
+	if ($filterurl eq 'insert')	{
+		$alert = insert_accesslogs($domain);
+		$pageno = 1;
+	};
+
+	if ($filterurl eq 'delete')	{
+		my $date 	= get_epoch_from_eu(params->{deletedate});
+		$alert 		= delete_accesslogs( $domain, $date );
+		$pageno 	= 1;
+	};
+
+	if ($fix){
+		$alert = update_accesslogs(params->{fix},$domain );
+
+	};
+
+	if ($domain ne 'domain')	{
+		# domain has been selected, determine number of rows and pages
+	    $rows	  = numrows_accesslogs($domain,$filterurl);
+	    $lastpage = ceil($rows->{numrows}/$ROWS_PER_PAGE);
+
+		# determine page number
+		if ($pageno  > $lastpage) { $pageno = $lastpage;} 
+		if ($pageno  < 1) 		  { $pageno = 1;} 
+	    @data = accesslogs($domain,$filterurl,$pageno);
+	}
+
+    template access => 
+    { 
+    	pageno   	=> $pageno,
+    	prevpage 	=> ($pageno == 1) ? 1 : ($pageno - 1),
+    	lastpage 	=> $lastpage,
+    	nextpage 	=> ($pageno +1),
+        data 	 	=> ((scalar @data > 0) ? @data : ''),
+        filterurl 	=> $filterurl,
+        records		=> $rows,
+        alert 	 	=> $alert,
+        domains     => domains(),
+        domain      => $domain,
+        xImage  	=> $xImage,
+        xBot        => $xBot,
+        xStatus		=> $xStatus,
+        codes 		=> codes_accesslogs($domain),	
+    };
+};
+
+get '/bots' => sub 
+{
+	my @bots = bots();
+
+	template bots => 
+	{ 
+        bots => @bots,
+    };
+};
+
+post '/bot/:ip' => sub
+{
+	my $host = gethostbyaddr(inet_aton(params->{ip}),AF_INET); 
+	insert_bots($host,params->{ip});
+};
+
+post '/bots/:option' => sub 
+{
+	if (params->{option} eq 'add'){ 
+		my $ok = insert_bots(params->{ua},params->{ip});
+	} elsif (params->{option} eq 'del'){ 
+		my $ok = delete_bots(params->{delete});
+	}
+
+	redirect '../bots',
 };
 
 get '/clients' => sub 
@@ -128,79 +225,12 @@ post '/domains/:option' => sub
 	redirect '../domains';
 };
 
-
-get '/logs' => sub 
+get 'dns/:ip' => sub 
 {
-	my @dirs=();
-	opendir(DIR, $NGINX_ERROR_LOG) or die "Can't opendir $NGINX_ERROR_LOG: $!";
- 
-    while (my $sub_folders = readdir(DIR)) 
-    {
-	    next if ($sub_folders =~ /^..?$/);  # skip . and ..
-	    my $path = $NGINX_ERROR_LOG . '/' . $sub_folders;
-	    next unless (-d $path);   # skip anything that isn't a directory
-	    push @dirs, $sub_folders;
-    }
-
-    closedir(DIR);
-
-	template logs => 
-	{ 
-        logs        => logs(),
-        name        => params->{name},
-        url         => params->{url},
-        dirs		=> \@dirs,
-    };
-};
-
-post '/logs/:option' => sub 
-{
-	if (params->{option} eq 'add')
-	{ 
-		debug ;
-		my $ok = insert_logs(params->{name},params->{url});
-	} 
-	elsif (params->{option} eq 'del')
-	{ 
-		my $ok = delete_logs(params->{delete});
-	}
-
-	redirect '../logs';
-};
-
-
-post '/bot/:ip' => sub
-{
-	my $host = gethostbyaddr(inet_aton(params->{ip}),AF_INET); 
-	insert_bots($host,params->{ip});
-};
-
-
-get '/bots' => sub 
-{
-	my @bots = bots();
-
-	template bots => 
-	{ 
-        bots => @bots,
-    };
-};
-
-post '/bots/:option' => sub 
-{
-	if (params->{option} eq 'add'){ 
-		my $ok = insert_bots(params->{ua},params->{ip});
-	} elsif (params->{option} eq 'del'){ 
-		my $ok = delete_bots(params->{delete});
-	}
-
-	redirect '../bots',
-};
-
-
-get '/progress' => sub 
-{
-	return session('progress');
+	my $host = gethostbyaddr(inet_aton(params->{ip}),AF_INET) // 'not found'; 
+	insert_bots($host,params->{ip}) unless (index($host,'bot'   ) == -1);
+	insert_bots($host,params->{ip}) unless (index($host,'spider') == -1);
+    return $host;
 };
 
 post '/error/domain' => sub 
@@ -279,77 +309,49 @@ any [ 'get', 'post' ] => '/error/*/**' => sub
     };
 };
 
-any [ 'get', 'post' ] => '/access/*/**' => sub 
-{ 
-	# variables passed
-	my ( $domain, $arg ) = splat;
-	my $filterurl 	= @{$arg}[0] // '000';
-   	my $pageno 		= @{$arg}[1] // 0;
-	my $fix    		= @{$arg}[2] // 0;
-	
-   	# declarations
-	my $lastpage    = 1;
-	my @data 		= ();
-	my $alert 		= '';
-	my $message		= '';
-	my $rows        = 0;
-	my $xImage 		= 0;
-	my $xBot 		= 0;
-	my $xStatus 	= 0;
+get '/logs' => sub 
+{
+	my @dirs=();
+	opendir(DIR, $NGINX_ERROR_LOG) or die "Can't opendir $NGINX_ERROR_LOG: $!";
+ 
+    while (my $sub_folders = readdir(DIR)) 
+    {
+	    next if ($sub_folders =~ /^..?$/);  # skip . and ..
+	    my $path = $NGINX_ERROR_LOG . '/' . $sub_folders;
+	    next unless (-d $path);   # skip anything that isn't a directory
+	    push @dirs, $sub_folders;
+    }
 
-	if ($filterurl eq 'filter')	{
-		$xImage 	= substr($pageno,0,1) // 0 ;
-		$xBot 		= substr($pageno,1,1) // 0 ;
-		$xStatus 	= substr($pageno,2,3) // 0 ;
-		$pageno 	= 1;
-		$filterurl 	= "$xImage$xBot$xStatus"; 
-	};
+    closedir(DIR);
 
-	if ($filterurl eq 'insert')	{
-		$alert = insert_accesslogs($domain);
-		$pageno = 1;
-	};
-
-	if ($filterurl eq 'delete')	{
-		my $date 	= get_epoch_from_eu(params->{deletedate});
-		$alert 		= delete_accesslogs( $domain, $date );
-		$pageno 	= 1;
-	};
-
-	if ($fix){
-		$alert = update_accesslogs(params->{fix},$domain );
-
-	};
-
-	if ($domain ne 'domain')	{
-		# domain has been selected, determine number of rows and pages
-	    $rows	  = numrows_accesslogs($domain,$filterurl);
-	    $lastpage = ceil($rows->{numrows}/$ROWS_PER_PAGE);
-
-		# determine page number
-		if ($pageno  > $lastpage) { $pageno = $lastpage;} 
-		if ($pageno  < 1) 		  { $pageno = 1;} 
-	    @data = accesslogs($domain,$filterurl,$pageno);
-	}
-
-    template access => 
-    { 
-    	pageno   	=> $pageno,
-    	prevpage 	=> ($pageno == 1) ? 1 : ($pageno - 1),
-    	lastpage 	=> $lastpage,
-    	nextpage 	=> ($pageno +1),
-        data 	 	=> ((scalar @data > 0) ? @data : ''),
-        filterurl 	=> $filterurl,
-        records		=> $rows,
-        alert 	 	=> $alert,
-        domains     => domains(),
-        domain      => $domain,
-        xImage  	=> $xImage,
-        xBot        => $xBot,
-        xStatus		=> $xStatus,
-        codes 		=> codes_accesslogs($domain),	
+	template logs => 
+	{ 
+        logs        => logs(),
+        name        => params->{name},
+        url         => params->{url},
+        dirs		=> \@dirs,
     };
 };
+
+post '/logs/:option' => sub 
+{
+	if (params->{option} eq 'add')
+	{ 
+		insert_logs(params->{name},params->{url});
+	} 
+	elsif (params->{option} eq 'del')
+	{ 
+		delete_logs(params->{delete});
+	}
+
+	redirect '../logs';
+};
+
+get '/progress' => sub 
+{
+	return session('progress');
+};
+
 
 get '/status-codes' => sub {
 	template status_codes => 
@@ -384,10 +386,6 @@ get '/enter-status-codes' => sub {
     close FH;
 };
 
-post '/access/domain' => sub 
-{
-	redirect '../access/'.params->{domain}.'/000';
-};
 
 
 # ------------- routines ----------------

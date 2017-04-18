@@ -71,7 +71,7 @@
     <div class="row">    
         <div class="col-md-5"><p>[% bot.ua %]</p></div>
         <div class="col-md-1"><p>[% bot.ip %]</p></div>
-        <div class="col-md-1"><p>[% bot.datum %]</p></div>
+        <div class="col-md-1"><p>[% bot.eudate %]</p></div>
         <div class="col-md-1">[% bot.spam %]</div>
         <div class="col-md-4"></div>
     </div>
