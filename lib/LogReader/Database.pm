@@ -93,7 +93,8 @@ url text);
 drop table clients;
 CREATE TABLE clients (
 id integer PRIMARY KEY,
-client text);
+client text,
+email text);
 
 drop table domains;
 CREATE TABLE domains (

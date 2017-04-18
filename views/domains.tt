@@ -28,6 +28,11 @@
                     <input type="text" name="domain" placeholder="Domain name (one word url friendly text)" class="input" size="50"><br>
                     <input type="text" name="fqdn" placeholder="fqdn (http://...)" class="input" size="50"><br>
                     <input type="text" name="image_url" placeholder="Image url" class="input" size="50">
+                    <select class="form-control" name="client">
+                    [% FOREACH client in clients -%]
+                        <option value="[% client.id %]" [% IF client.id == client %]selected[% END %]>[% client.id %]. [% client.client %] </option>
+                    [% END %]
+                    </select>
                     <button type="submit" class="btn btn-success">Add&nbsp;&nbsp;</button>    
                 </div>            
             </form> 
