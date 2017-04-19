@@ -608,11 +608,11 @@ sub numrows_errorlogs
         $option .= " and status like 'crit' "; 
     }
  
-    my  $qry  = "SELECT count(*) as numrows, 
-              strftime('%d-%m-%Y',date(min(e.date),'unixepoch')) as firstdate, 
-              strftime('%d-%m-%Y',date(max(e.date),'unixepoch')) as lastdate  
-                    FROM error_log e LEFT JOIN bots on e.client = bots.ip 
-                    WHERE domain like ? $option";
+    my  $qry  =  "SELECT  count(*) as numrows,
+                          strftime('%d-%m-%Y',date(min(e.date),'unixepoch')) as firstdate, 
+                          strftime('%d-%m-%Y',date(max(e.date),'unixepoch')) as lastdate  
+                  FROM    error_log e LEFT JOIN bots on e.client = bots.ip 
+                  WHERE   domain like ? $option GROUP BY request";
 
     my $sth = database('sqlserver')->prepare($qry);
     $sth->execute($domain);
