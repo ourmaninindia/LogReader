@@ -120,8 +120,8 @@
     [% IF pageno == 1 %]
     FIRST PREV
     [% ELSE %]
-    <a href='[% request.uri_base %]/[% domain %]/error/[% filterurl %]/1'>FIRST</a> 
-    <a href='[% request.uri_base %]/[% domain %]/error/[% filterurl %]/[% prevpage %]'>PREV</a>
+    <a href='[% request.uri_base %]/error/[% domain %]/[% filterurl %]/1'>FIRST</a> 
+    <a href='[% request.uri_base %]/error/[% domain %]/[% filterurl %]/[% prevpage %]'>PREV</a>
     [% END %] 
     
     ( Page [% pageno %] of [% lastpage %] ) 
@@ -129,8 +129,8 @@
     [% IF (pageno == lastpage) %]
     NEXT LAST
     [% ELSE %]
-    <a href='[% request.uri_base %]/[% domain %]/error/[% filterurl %]/[% nextpage %]'>NEXT</a>
-    <a href='[% request.uri_base %]/[% domain %]/error/[% filterurl %]/[% lastpage %]'>LAST</a>
+    <a href='[% request.uri_base %]/error/[% domain %]/[% filterurl %]/[% nextpage %]'>NEXT</a>
+    <a href='[% request.uri_base %]/error/[% domain %]/[% filterurl %]/[% lastpage %]'>LAST</a>
     [% END %]
     </div>
     <div class="col-md-2 red" id="hostname"></div>
