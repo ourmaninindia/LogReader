@@ -100,6 +100,10 @@ any [ 'get', 'post' ] => '/access/*/**' => sub
 
 	};
 
+	$xImage 	= substr($filterurl,0,1);
+	$xBot 		= substr($filterurl,1,1);
+	$xStatus 	= substr($filterurl,2,1);
+
 	if ($domain ne 'domain')	{
 		# domain has been selected, determine number of rows and pages
 	    $rows	  = numrows_accesslogs($domain,$filterurl);
@@ -256,14 +260,14 @@ any [ 'get', 'post' ] => '/error/*/**' => sub
 	my $rows        = 0;
 	my $xImage 		= 0;
 	my $xBot 		= 0;
-	my $xCritic 	= 0;
+	my $xStatus 	= 0;
 
 	if ($filterurl eq 'filter')	{
 		$xImage 	= substr($pageno,0,1);
 		$xBot 		= substr($pageno,1,1);
-		$xCritic 	= substr($pageno,2,1);
+		$xStatus 	= substr($pageno,2,1);
 		$pageno 	= 1;
-		$filterurl 	= "$xImage$xBot$xCritic"; 
+		$filterurl 	= "$xImage$xBot$xStatus"; 
 	};
 
 	if ($filterurl eq 'insert')	{
@@ -281,6 +285,10 @@ any [ 'get', 'post' ] => '/error/*/**' => sub
 		$alert = update_errorlogs(params->{fix},$domain );
 
 	};
+
+	$xImage 	= substr($filterurl,0,1);
+	$xBot 		= substr($filterurl,1,1);
+	$xStatus 	= substr($filterurl,2,1);
 
 	if ($domain ne 'domain')	{
 		# domain has been selected, determine number of rows and pages
@@ -307,7 +315,7 @@ any [ 'get', 'post' ] => '/error/*/**' => sub
         domain      => $domain,
         xImage  	=> $xImage,
         xBot        => $xBot,
-        xCritic     => $xCritic,	
+        xStatus     => $xStatus,	
     };
 };
 
