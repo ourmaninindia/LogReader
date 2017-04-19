@@ -62,13 +62,27 @@ CREATE TABLE access_log (
  size integer,
  domain integer);
 
-drop table status_codes;
-CREATE TABLE status_codes (
- id integer PRIMARY KEY,
- code integer,
- title text,
- rfc text,
- explanation text);
+drop table bots;
+CREATE TABLE bots (
+bots_id integer PRIMARY KEY,
+ua text,
+ip text,
+datum integer NOT NULL,
+spam integer);
+
+drop table clients;
+CREATE TABLE clients (
+clients_id integer PRIMARY KEY,
+client text,
+email text);
+
+drop table domains;
+CREATE TABLE domains (
+domains_id integer PRIMARY KEY,
+domain text,
+fqdn text,
+image_url,
+clients_id integer);
 
 drop table error_log;
 CREATE TABLE error_log (
@@ -90,31 +104,15 @@ id_logs integer PRIMARY KEY,
 log text,
 url text);
 
+drop table status_codes;
+CREATE TABLE status_codes (
+ id integer PRIMARY KEY,
+ code integer,
+ title text,
+ rfc text,
+ explanation text);
+
 ALTER TABLE domains ADD COLUMN url text;
-
-
-drop table clients;
-CREATE TABLE clients (
-clients_id integer PRIMARY KEY,
-client text,
-email text);
-
-drop table domains;
-CREATE TABLE domains (
-domains_id integer PRIMARY KEY,
-domain text,
-fqdn text,
-image_url,
-clients_id integer);
-
-drop table bots;
-CREATE TABLE bots (
-bots_id integer PRIMARY KEY,
-ua text,
-ip text,
-datum integer NOT NULL,
-spam integer);
-
 
 Sort access by Response Codes
 cat access.log | cut -d '"' -f3 | cut -d ' ' -f2 | sort | uniq -c | sort -rn

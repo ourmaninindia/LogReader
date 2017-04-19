@@ -172,7 +172,13 @@
             <div class="col-md-1">[% line.status      %]</div>
             <div class="col-md-1">[% line.method      %]</div>
             <div class="col-md-4 red">[% line.request %]</div>
-            <div class="col-md-2"><a onclick="dnslookup('[% line.client %]')" href="#">[% line.client %]</a></div>
+            <div class="col-md-2">
+                [% IF line.ua %]
+                    [% line.ua %]
+                [% ELSE %]
+                    <a onclick="dnslookup('[% line.client %]')" href="#">[% line.client %]</a>
+                [% END %]
+            </div>
             <div class="col-md-2">[% line.host        %]</div>
             <div class="col-md-1">
                 <div class="row">
