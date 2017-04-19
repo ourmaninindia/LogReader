@@ -10,6 +10,17 @@ use Data::Dumper;
 use Exporter qw{import};
 
 our @EXPORT = qw{
+    accesslogs
+    numrows_accesslogs
+    codes_accesslogs
+    insert_accesslogs
+    update_accesslogs
+    delete_accesslogs
+    bots
+    get_id_bots
+    insert_bots
+    update_bots
+    delete_bots
     clients
     insert_clients
     update_clients
@@ -18,24 +29,14 @@ our @EXPORT = qw{
     insert_domains
     update_domains
     delete_domains
-    logs 
-    insert_logs
-    delete_logs
-    bots
-    get_id_bots
-    insert_bots
-    delete_bots
-    accesslogs
-    numrows_accesslogs
-    codes_accesslogs
-    insert_accesslogs
-    update_accesslogs
-    delete_accesslogs
     errorlogs
     numrows_errorlogs
     insert_errorlogs
     update_errorlogs
     delete_errorlogs
+    logs 
+    insert_logs
+    delete_logs
     status_codes
     insert_status_codes
     update_status_codes
@@ -386,6 +387,23 @@ sub insert_bots
     return
 }
 
+sub update_bots 
+{
+    my $bots_id = shift // 0;
+    my $ua      = shift // '';
+    my $ip      = shift // '';
+    my $date    = shift;
+    my $spam    = shift // 0;
+
+    $date = $date ? LogReader::get_epoch_from_eu($date) : time();
+
+    my $sth = database('sqlserver')->prepare(q/UPDATE bots SET ua=?,ip=?,datum=?,spam=? WHERE bots_id = ?;/);
+    $sth->execute( $ua,$ip,$date,$spam,$bots_id );
+    $sth->finish;
+    
+    return
+}
+
 sub delete_bots 
 {
     my $id = shift // 0;
@@ -412,7 +430,7 @@ sub insert_clients
   
   return 0 unless (length($client) != 0 );
 
-  my $qry = qq(INSERT INTO clients (client,email) VALUES (?,?);); 
+  my $qry = q/INSERT INTO clients (client,email) VALUES (?,?);/; 
 
   my $sth = database('sqlserver')->prepare($qry);
      $sth->execute("$client","$email") or die "Unable to insert.";
@@ -429,7 +447,7 @@ sub update_clients
   
   return 0 unless ($id);
 
-  my $qry = qq(UPDATE clients SET client=?,email=? WHERE clients_id=?;); 
+  my $qry = q/UPDATE clients SET client=?,email=? WHERE clients_id=?;/; 
 
   my $sth = database('sqlserver')->prepare($qry);
      $sth->execute("$client","$email",$id) or die "Unable to update.";

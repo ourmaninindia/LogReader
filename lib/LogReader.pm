@@ -12,7 +12,7 @@ use POSIX qw/ceil/;
 use Time::Local;
 use Socket;
 use LWP::UserAgent;
-#use LWP::Protocol::https;
+use LWP::Protocol::https;
 
 use open qw(:std :utf8);
 
@@ -149,9 +149,11 @@ post '/bot/:ip' => sub
 post '/bots/:option' => sub 
 {
 	if (params->{option} eq 'add'){ 
-		my $ok = insert_bots(params->{ua},params->{ip});
+		insert_bots(params->{ua},params->{ip},params->{spam});
 	} elsif (params->{option} eq 'del'){ 
-		my $ok = delete_bots(params->{delete});
+		delete_bots(params->{delete});
+	} elsif (params->{option} eq 'update'){
+		update_bots(params->{bots_id},params->{ua},params->{ip},params->{date},params->{spam});
 	}
 
 	redirect '../bots',

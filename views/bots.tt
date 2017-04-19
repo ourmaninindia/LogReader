@@ -18,9 +18,8 @@
             </div>
         </div> 
     </nav>
-
+    <div class="spacing"></div>
     <!-- Main jumbotron  -->
-    <div class="jumbotron">
         <div id="jumbo">
             <div class="row">&nbsp;</div>
             <div class="row">
@@ -51,7 +50,26 @@
                 </div>
             </div>
         </div>
+
+    <!-- edit  --> 
+    <div id="edit">
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <div class="col-md-6">
+            <form name="edit" class="navbar-form" method="POST" action="[% request.uri_base %]/bots/update">
+                <div class="form-group">
+                    <input type="text" name="bots_id" placeholder="ID" class="input" size="50"><br>
+                    <input type="text" name="ua" placeholder="Bot name" class="input" size="50"><br>
+                    <input type="text" name="ip" placeholder="IP address" class="input" size="50"><br>
+                    <input type="text" name="date" placeholder="dd/mm/yyyy" class="input" size="50"><br>
+                    <input type="text" name="spam" placeholder="Spam (1 or 0)" class="input" size="50"><br>
+                    <button type="submit" class="btn btn-success">Update&nbsp;&nbsp;</button>    
+                </div>            
+            </form> 
+            </div>
+        </div>
     </div>
+   
      <h3>Bots</h3>
 
     [% IF alert.type == "success" %]<div class = "alert alert-success">[% alert.message %]</div>[% END %]
@@ -73,7 +91,9 @@
         <div class="col-md-1"><p>[% bot.ip %]</p></div>
         <div class="col-md-1"><p>[% bot.eudate %]</p></div>
         <div class="col-md-1">[% bot.spam %]</div>
-        <div class="col-md-4"></div>
+        <div class="col-md-1">
+            <button onclick='editThis("[% bot.bots_id %]","[% bot.ua %]","[% bot.ip %]","[% bot.eudate %]","[% bot.spam %]");' class="btn btn-xs btn-info"><span class="glyphicon glyphicon-edit"></span></button>  
+        </div>
     </div>
     [% END %]
 </div>
@@ -81,13 +101,31 @@
 
 <script type="text/javascript">
 
-    /* settings */
-    function toggleSettings() {
-        var e = document.getElementById('settings');
-        if (e.style.display === 'none' || e.style.display === '') {
-            e.style.display = 'block';
+   function editThis()
+   {
+        var j = document.getElementById('jumbo');
+        j.style.display = 'none';  
+        var e = document.getElementById('edit');
+        e.style.display = 'block';
+
+        document.forms["edit"]["bots_id"].value = arguments[0];
+        document.forms["edit"]["ua"     ].value = arguments[1];
+        document.forms["edit"]["ip"     ].value = arguments[2];
+        document.forms["edit"]["date"   ].value = arguments[3];
+        document.forms["edit"]["spam"   ].value = arguments[4];
+    }
+
+    /* hide jumbo section */
+    function toggleSettings() 
+    {
+        var e = document.getElementById('edit');
+        e.style.display = 'none';
+
+        var j = document.getElementById('jumbo');
+        if (j.style.display === 'none' || j.style.display === '') {
+            j.style.display = 'block';
         } else {
-            e.style.display = 'none';
+            j.style.display = 'none';
         }
     }
 
