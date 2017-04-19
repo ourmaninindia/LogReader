@@ -53,7 +53,7 @@
 
             <div class="col-md-5">&nbsp;</div>
             <!-- delete -->
-            <form class="clearfix" action="[% request.uri_base %]/[% domain %]/delete" method="POST">
+            <form class="clearfix" action="[% request.uri_base %]/access/delete/[% domain %]" method="POST">
                 <div class="col-md-2 nopadding">
                     <div class="form-group">
                         <div class='input-group date' id='deletedate'>
