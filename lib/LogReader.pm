@@ -62,7 +62,7 @@ any [ 'get', 'post' ] => '/access/*/**' => sub
 { 
 	# variables passed
 	my ( $domain, $arg ) = splat;
-	my $filterurl 	= @{$arg}[0] // '000';
+	my $filter 		= @{$arg}[0] // '000';
    	my $pageno 		= @{$arg}[1] // 0;
 	my $fix    		= @{$arg}[2] // 0;
 	
@@ -76,43 +76,28 @@ any [ 'get', 'post' ] => '/access/*/**' => sub
 	my $xBot 		= 0;
 	my $xStatus 	= 0;
 
-	if ($filterurl eq 'filter')	{
-		$xImage 	= substr($pageno,0,1) // 0 ;
-		$xBot 		= substr($pageno,1,1) // 0 ;
-		$xStatus 	= substr($pageno,2,3) // 0 ;
-		$pageno 	= 1;
-		$filterurl 	= "$xImage$xBot$xStatus"; 
-	};
+	$xImage 	= substr($filter,0,1) // 0 ;
+	$xBot 		= substr($filter,1,1) // 0 ;
+	$xStatus 	= substr($filter,2,3) // 0 ;
 
-	if ($filterurl eq 'insert')	{
+	if ($fix eq 'insert')	{
 		$alert = insert_accesslogs($domain);
-		$pageno = 1;
-	};
-
-	if ($filterurl eq 'delete')	{
-		my $date 	= get_epoch_from_eu(params->{deletedate});
-		$alert 		= delete_accesslogs( $domain, $date );
-		$pageno 	= 1;
-	};
-
-	if ($fix){
+	} elsif ($fix eq 'delete')	{
+		my $date = get_epoch_from_eu(params->{deletedate});
+		$alert = delete_accesslogs( $domain, $date );
+	} elsif ($fix){
 		$alert = update_accesslogs(params->{fix},$domain );
-
 	};
-
-	$xImage 	= substr($filterurl,0,1);
-	$xBot 		= substr($filterurl,1,1);
-	$xStatus 	= substr($filterurl,2,1);
 
 	if ($domain ne 'domain')	{
 		# domain has been selected, determine number of rows and pages
-	    $rows	  = numrows_accesslogs($domain,$filterurl);
+	    $rows	  = numrows_accesslogs($domain,$filter);
 	    $lastpage = ceil($rows->{numrows}/$ROWS_PER_PAGE);
 
 		# determine page number
 		if ($pageno  > $lastpage) { $pageno = $lastpage;} 
 		if ($pageno  < 1) 		  { $pageno = 1;} 
-	    @data = accesslogs($domain,$filterurl,$pageno);
+	    @data = accesslogs($domain,$filter,$pageno);
 	}
 
     template access => 
@@ -122,7 +107,7 @@ any [ 'get', 'post' ] => '/access/*/**' => sub
     	lastpage 	=> $lastpage,
     	nextpage 	=> ($pageno +1),
         data 	 	=> ((scalar @data > 0) ? @data : ''),
-        filterurl 	=> $filterurl,
+        filter 		=> $filter,
         records		=> $rows,
         alert 	 	=> $alert,
         domains     => domains(),
@@ -248,7 +233,7 @@ any [ 'get', 'post' ] => '/error/*/**' => sub
 { 
 	# variables passed
 	my ( $domain, $arg ) = splat;
-	my $filterurl 	= @{$arg}[0] // '000';
+	my $filter	 	= @{$arg}[0] // '000';
    	my $pageno 		= @{$arg}[1] // 0;
 	my $fix    		= @{$arg}[2] // 0;
 	
@@ -262,43 +247,28 @@ any [ 'get', 'post' ] => '/error/*/**' => sub
 	my $xBot 		= 0;
 	my $xStatus 	= 0;
 
-	if ($filterurl eq 'filter')	{
-		$xImage 	= substr($pageno,0,1);
-		$xBot 		= substr($pageno,1,1);
-		$xStatus 	= substr($pageno,2,1);
-		$pageno 	= 1;
-		$filterurl 	= "$xImage$xBot$xStatus"; 
-	};
+	$xImage 	= substr($filter,0,1);
+	$xBot 		= substr($filter,1,1);
+	$xStatus 	= substr($filter,2,1);
 
-	if ($filterurl eq 'insert')	{
+	if ($fix eq 'insert')	{
 		$alert = insert_errorlogs($domain);
-		$pageno = 1;
-	};
-
-	if ($filterurl eq 'delete')	{
+	} elsif ($fix eq 'delete')	{
 		my $date 	= get_epoch_from_eu(params->{deletedate});
 		$alert 		= delete_errorlogs( $domain, $date );
-		$pageno 	= 1;
-	};
-
-	if ($fix){
+	} elsif ($fix){
 		$alert = update_errorlogs(params->{fix},$domain );
-
 	};
-
-	$xImage 	= substr($filterurl,0,1);
-	$xBot 		= substr($filterurl,1,1);
-	$xStatus 	= substr($filterurl,2,1);
 
 	if ($domain ne 'domain')	{
 		# domain has been selected, determine number of rows and pages
-	    $rows	  = numrows_errorlogs($domain,$filterurl);
+	    $rows	  = numrows_errorlogs($domain,$filter);
 	    $lastpage = ceil($rows->{numrows}/$ROWS_PER_PAGE);
 
 		# determine page number
 		if ($pageno  > $lastpage) { $pageno = $lastpage;} 
 		if ($pageno  < 1) 		  { $pageno = 1;} 
-	    @data = errorlogs($domain,$filterurl,$pageno);
+	    @data = errorlogs($domain,$filter,$pageno);
 	}
 
     template LogReader => 
@@ -308,7 +278,7 @@ any [ 'get', 'post' ] => '/error/*/**' => sub
     	lastpage 	=> $lastpage,
     	nextpage 	=> ($pageno +1),
         data 	 	=> ((scalar @data > 0) ? @data : ''),
-        filterurl 	=> $filterurl,
+        filter 	 	=> $filter,
         records		=> $rows,
         alert 	 	=> $alert,
         domains     => domains(),

@@ -50,10 +50,9 @@
                     <div class="progress-bar" id="progress"></div>
                 </div>
             </div>     
-
             <div class="col-md-5">&nbsp;</div>
             <!-- delete -->
-            <form class="clearfix" action="[% request.uri_base %]/error/[% domain %]/delete" method="POST">
+            <form class="clearfix" action="[% request.uri_base %]/error/[% domain %]/[% filter %]/[% pageno %]/delete" method="POST">
                 <div class="col-md-2 nopadding">
                     <div class="form-group">
                         <div class='input-group date' id='deletedate'>
@@ -120,8 +119,8 @@
     [% IF pageno == 1 %]
     FIRST PREV
     [% ELSE %]
-    <a href='[% request.uri_base %]/error/[% domain %]/[% filterurl %]/1'>FIRST</a> 
-    <a href='[% request.uri_base %]/error/[% domain %]/[% filterurl %]/[% prevpage %]'>PREV</a>
+    <a href='[% request.uri_base %]/error/[% domain %]/[% filter %]/1'>FIRST</a> 
+    <a href='[% request.uri_base %]/error/[% domain %]/[% filter %]/[% prevpage %]'>PREV</a>
     [% END %] 
     
     ( Page [% pageno %] of [% lastpage %] ) 
@@ -129,8 +128,8 @@
     [% IF (pageno == lastpage) %]
     NEXT LAST
     [% ELSE %]
-    <a href='[% request.uri_base %]/error/[% domain %]/[% filterurl %]/[% nextpage %]'>NEXT</a>
-    <a href='[% request.uri_base %]/error/[% domain %]/[% filterurl %]/[% lastpage %]'>LAST</a>
+    <a href='[% request.uri_base %]/error/[% domain %]/[% filter %]/[% nextpage %]'>NEXT</a>
+    <a href='[% request.uri_base %]/error/[% domain %]/[% filter %]/[% lastpage %]'>LAST</a>
     [% END %]
     </div>
     <div class="col-md-2 red" id="hostname"></div>
@@ -138,7 +137,7 @@
     <div class="col-md-1"></div>
 </div>
 
-<form action="[% request.uri_base %]/error/[% domain %]/[% filterurl %]/[% pageno %]/fix" method="POST">
+<form action="[% request.uri_base %]/error/[% domain %]/[% filter %]/[% pageno %]/fix" method="POST">
     <div class="row">
         <div class="col-md-1"><b>Date</b></div>
         <div class="col-md-1"><b>Status</b></div>
@@ -242,7 +241,7 @@
     function deletedata () {
         var date = $('#deletedate').val();
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', "[% request.uri_base %]/error/" + domain + "/delete", true);
+        xhr.open('POST', "[% request.uri_base %]/error/" + domain + '/[% filter %]/[% pageno %]/delete', true);
         xhr.send();
     }
 
@@ -262,7 +261,7 @@
         var sel = document.getElementById("domain");
         var domain = sel.options[sel.selectedIndex].text;
 
-        window.location.href = '[% request.uri_base %]/error/' + domain + '/insert';
+        window.location.href = '[% request.uri_base %]/error/' + domain + '/[% filter %]/[% pageno %]/insert';
     }
 
     function clickFilter()  {
@@ -293,7 +292,7 @@
                 break;
             }
         }
-        window.location.href = '[% request.uri_base %]/error/' + domain + '/filter/' + xImage + xBot + xStatus ;
+        window.location.href = '[% request.uri_base %]/error/' + domain + '/' + xImage + xBot + xStatus + '/[% pageno %]';
     }
 
     function clearFilter()  {
