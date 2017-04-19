@@ -53,7 +53,7 @@
 
             <div class="col-md-5">&nbsp;</div>
             <!-- delete -->
-            <form class="clearfix" action="[% request.uri_base %]/access/[% domain %]/[% filter %]/[% pageno %]/delete" method="POST">
+            <form class="clearfix" action="[% request.uri_base %]/access/[% domain %]/[% filtr %]/[% pageno %]/delete" method="POST">
                 <div class="col-md-2 nopadding">
                     <div class="form-group">
                         <div class='input-group date' id='deletedate'>
@@ -120,8 +120,8 @@
     [% IF pageno == 1 %]
     FIRST PREV
     [% ELSE %]
-    <a href='[% request.uri_base %]/access/[% domain %]/[% filter %]/1'>FIRST</a> 
-    <a href='[% request.uri_base %]/access/[% domain %]/[% filter %]/[% prevpage %]'>PREV</a>
+    <a href='[% request.uri_base %]/access/[% domain %]/[% filtr %]/1'>FIRST</a> 
+    <a href='[% request.uri_base %]/access/[% domain %]/[% filtr %]/[% prevpage %]'>PREV</a>
     [% END %] 
     
     ( Page [% pageno %] of [% lastpage %] ) 
@@ -129,8 +129,8 @@
     [% IF (pageno == lastpage) %]
     NEXT LAST
     [% ELSE %]
-    <a href='[% request.uri_base %]/access/[% domain %]/[% filter %]/[% nextpage %]'>NEXT</a>
-    <a href='[% request.uri_base %]/access/[% domain %]/[% filter %]/[% lastpage %]'>LAST</a>
+    <a href='[% request.uri_base %]/access/[% domain %]/[% filtr %]/[% nextpage %]'>NEXT</a>
+    <a href='[% request.uri_base %]/access/[% domain %]/[% filtr %]/[% lastpage %]'>LAST</a>
     [% END %]
     </div>
     <div class="col-md-2 red" id="hostname"></div>
@@ -138,7 +138,7 @@
     <div class="col-md-1"></div>
 </div>
 
-<form action="[% request.uri_base %]/access/[% domain %]/[% filter %]/[% pageno %]/fix" method="POST">
+<form action="[% request.uri_base %]/access/[% domain %]/[% filtr %]/[% pageno %]/fix" method="POST">
 
     <div class="row">
         <div class="col-md-1"><b>Date</b></div>
@@ -261,7 +261,7 @@
     function deletedata () {
         var date = $('#deletedate').val();
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', "[% request.uri_base %]/access/" + domain + '/[% filter %]/[% pageno %]/delete', true);
+        xhr.open('POST', "[% request.uri_base %]/access/" + domain + '/[% filtr %]/[% pageno %]/delete', true);
         xhr.send();
     }
 
@@ -281,7 +281,7 @@
         var sel = document.getElementById("domain");
         var domain = sel.options[sel.selectedIndex].text;
 
-        window.location.href = '[% request.uri_base %]/access/' + domain + '/[% filter %]/[% pageno %]/insert';
+        window.location.href = '[% request.uri_base %]/access/' + domain + '/[% filtr %]/[% pageno %]/insert';
     }
 
     function clickFilter()  {
