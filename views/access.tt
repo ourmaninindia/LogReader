@@ -57,7 +57,7 @@
                 <div class="col-md-2 nopadding">
                     <div class="form-group">
                         <div class='input-group date' id='deletedate'>
-                            <input type='text' class="form-control" name="deletedate" />
+                            <input type='text' class="form-control" placeholder="dd/mm/yyyy" name="deletedate" />
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-calendar"></span>
                             </span>

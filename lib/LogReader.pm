@@ -255,7 +255,7 @@ any [ 'get', 'post' ] => '/error/*/**' => sub
 		$alert = insert_errorlogs($domain);
 	} elsif ($fix eq 'delete')	{
 		my $date 	= get_epoch_from_eu(params->{deletedate});
-		$alert 		= delete_errorlogs( $domain, $date );
+		$alert 		= delete_errorlogs( $domain, $date, params->{deletedate} );
 	} elsif ($fix){
 		$alert = update_errorlogs(params->{fix},$domain );
 	};
@@ -372,8 +372,8 @@ get '/enter-status-codes' => sub {
 
 sub get_epoch {
 	
-	my $date = shift // 0;
-	my $time = shift // 0;
+	my $date = shift // '00-00-0000';
+	my $time = shift // '0:0:0';
 
 	my $standard_time = 0;
 
@@ -394,7 +394,7 @@ sub get_epoch_from_eu {
 
 	my $standard_time = 0;
 	
-	my ($dd, $mm,  $yyyy ) = (split /-/,$date)[0,1,2];
+	my ($dd, $mm,  $yyyy ) = (split /\//,$date)[0,1,2];
 	my ($hour, $min, $sec) = (split /:/,$time)[0,1,2];
 	
 	if ($mm > 0) {

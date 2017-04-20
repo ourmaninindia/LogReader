@@ -202,11 +202,11 @@ sub numrows_accesslogs
         $option .= ' and status = '.substr($filterurl,2,3).' '; 
     }
  
-    my  $qry = "SELECT  count(*) as numrows, 
+    my  $qry = "SELECT  count(*) as numrows, firstdate, lastdate FROM( SELECT 
                         strftime('%d-%m-%Y',date(min(date),'unixepoch')) as firstdate, 
                         strftime('%d-%m-%Y',date(max(date),'unixepoch')) as lastdate  
                 FROM    access_log 
-                WHERE   domain like ? $option";
+                WHERE   domain like ? $option )";
 
     my $sth = database('sqlserver')->prepare($qry);
     $sth->execute($domain);
@@ -608,11 +608,10 @@ sub numrows_errorlogs
         $option .= " and status like 'crit' "; 
     }
  
-    my  $qry  =  "SELECT  count(*) as numrows,
-                          strftime('%d-%m-%Y',date(min(e.date),'unixepoch')) as firstdate, 
+    my  $qry  =  "SELECT  count(*) as numrows, firstdate, lastdate FROM (SELECT strftime('%d-%m-%Y',date(min(e.date),'unixepoch')) as firstdate, 
                           strftime('%d-%m-%Y',date(max(e.date),'unixepoch')) as lastdate  
                   FROM    error_log e LEFT JOIN bots on e.client = bots.ip 
-                  WHERE   domain like ? $option GROUP BY request";
+                  WHERE   domain like ? $option GROUP BY request)";
 
     my $sth = database('sqlserver')->prepare($qry);
     $sth->execute($domain);
@@ -621,6 +620,7 @@ sub numrows_errorlogs
 
     return $row;
 }
+
 
 sub insert_errorlogs 
 {
@@ -780,6 +780,7 @@ sub delete_errorlogs
 {    
     my  $domain = shift // 'domain';
     my  $date   = shift // '01-01-1970';
+    my  $eudate = shift // 'the selected date';
     my  $alert;
 
     my  $qry = 'DELETE FROM error_log where domain like ? and date < ?';
@@ -788,12 +789,10 @@ sub delete_errorlogs
         $sth->finish;
     
     $alert->{type}    = 'success';
-    $alert->{message} = "Log data up to $date has been deleted from the database.";
+    $alert->{message} = "Log data up to $eudate has been deleted from the database.";
 
     return $alert;
 }
-
-
 
 
 sub logs 
