@@ -192,7 +192,7 @@
         </div>
         <div class="row toggle-row">
             <div class="col-md-1">
-                id=[% line.theid %]
+                [% line.theid %]
             </div>
             <div class="col-md-11">
                 [% line.error %]

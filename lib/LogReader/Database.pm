@@ -202,11 +202,17 @@ sub numrows_accesslogs
         $option .= ' and status = '.substr($filterurl,2,3).' '; 
     }
  
-    my  $qry = "SELECT  count(*) as numrows, firstdate, lastdate FROM( SELECT 
-                        strftime('%d-%m-%Y',date(min(date),'unixepoch')) as firstdate, 
-                        strftime('%d-%m-%Y',date(max(date),'unixepoch')) as lastdate  
-                FROM    access_log 
-                WHERE   domain like ? $option )";
+    my  $qry = "SELECT  count(*) as numrows, 
+                        strftime('%d-%m-%Y',date(min(firstdate),'unixepoch')) as firstdate, 
+                        strftime('%d-%m-%Y',date(max(lastdate),'unixepoch')) as lastdate 
+                FROM 
+                (
+                  SELECT  count(*) as numrows,  
+                          date(min(date) as firstdate, 
+                          date(max(date) as lastdate  
+                  FROM    access_log 
+                  WHERE   domain like ? $option 
+                )";
 
     my $sth = database('sqlserver')->prepare($qry);
     $sth->execute($domain);
@@ -281,7 +287,7 @@ sub insert_accesslogs
         my ($dd,$mm,$year) = split /\//, (substr $vars[3],1);
         my ($yyyy,$hour,$min,$sec) = split /:/,$year;
         my $thisdate  = LogReader::timelocal($sec, $min, $hour, $dd, LogReader::month2num($mm) -1, ($yyyy - 1900));
-        my $date      = $thisdate;
+        my $date      = $thisdate // time();
 
         # only enter new data
         next if ($thisdate < $lastdate);
@@ -642,7 +648,7 @@ sub insert_errorlogs
   my $progress      = 0;
   my $progress_last = 0;
 
-  # determine the last date entered
+  # determine the last date entered as not to enter old entries twice
   my  $lastdate = database('sqlserver')->selectrow_array("SELECT max(date) as lastdate FROM error_log WHERE domain like '%$domain%';");
       $lastdate = $lastdate // 0;
 
@@ -662,8 +668,8 @@ sub insert_errorlogs
   my $application = app();
   my $my_session  = LogReader::session();
 
-    my $qry = qq(INSERT INTO error_log (date,status,client,server,request,method,host,error,fix,domain) 
-                VALUES (?,?,?,?,?,?,?,?,0,?);); 
+    my $qry = q/INSERT INTO error_log (date,status,client,server,request,method,host,error,fix,domain) 
+                VALUES (?,?,?,?,?,?,?,?,0,?);/; 
     my $sth = database('sqlserver')->prepare($qry);
 
   # start the work
@@ -678,7 +684,7 @@ sub insert_errorlogs
       # determine the date of this entry
       my $thisdate = LogReader::get_epoch( $vars[0], $vars[1] ); 
       # not all logs have a date
-      $thisdate = time() unless $thisdate;
+      $thisdate = time() unless $thisdate > 0;
       # only enter new data
       next if ($thisdate < $lastdate);
 
