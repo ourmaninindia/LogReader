@@ -125,7 +125,7 @@
                     [% dom.client %]
                 </div>
                 <div class="col-md-1">
-                    <button onclick='editThis([% dom.domains_id %],"[% dom.domain %]","[% dom.fqdn %]",[% dom.port %],"[% dom.image_url %]",[% dom.clients_id %])' class="btn btn-xs btn-info">
+                    <button onclick='editThis([% dom.domains_id %],"[% dom.domain %]","[% dom.fqdn %]","[% dom.port %]","[% dom.image_url %]",[% dom.clients_id %])' class="btn btn-xs btn-info">
                         <span class="glyphicon glyphicon-edit"></span>
                     </button>  
                 </div>
