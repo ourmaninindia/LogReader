@@ -94,9 +94,6 @@
                 <div class="col-md-2">
                     <b>FQDN</b>
                 </div>
-                <div class="col-md-1">
-                    <b>Port</b>
-                </div>
                 <div class="col-md-3">
                     <b>Image</b>
                 </div>
@@ -104,7 +101,14 @@
                     <b>Client</b>
                 </div>
                 <div class="col-md-1">
-                    <b>Edit</b>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <b>Port</b>
+                        </div>
+                        <div class="col-md-6">
+                            <b>Edit</b>
+                        </div>
+                    </div>
                 </div>
             </div>
             [% FOREACH dom in domains -%]
@@ -115,9 +119,6 @@
                 <div class="col-md-2">
                     [% dom.fqdn %]
                 </div>
-                <div class="col-md-1">
-                    [% dom.port %]
-                </div>
                 <div class="col-md-3">
                     [% dom.image_url %]
                 </div>
@@ -125,9 +126,16 @@
                     [% dom.client %]
                 </div>
                 <div class="col-md-1">
-                    <button onclick='editThis([% dom.domains_id %],"[% dom.domain %]","[% dom.fqdn %]","[% dom.port %]","[% dom.image_url %]",[% dom.clients_id %])' class="btn btn-xs btn-info">
-                        <span class="glyphicon glyphicon-edit"></span>
-                    </button>  
+                    <div class="row">
+                        <div class="col-md-6">
+                            [% dom.port %]
+                        </div>
+                        <div class="col-md-6">
+                            <button onclick='editThis("[% dom.domains_id %]","[% dom.domain %]","[% dom.fqdn %]","[% dom.port %]","[% dom.image_url %]","[% dom.clients_id %]")' class="btn btn-xs btn-info">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </button>  
+                        </div>
+                    </div>
                 </div>
             </div>
             [% END %]    
