@@ -27,6 +27,7 @@
                 <div class="form-group">
                     <input type="text" name="domain" placeholder="Domain name (one word url friendly text)" class="input" size="50"><br>
                     <input type="text" name="fqdn" placeholder="fqdn (http://...)" class="input" size="50"><br>
+                    <input type="text" name="port" placeholder="Port number" class="input" size="50"><br>
                     <input type="text" name="image_url" placeholder="Image url" class="input" size="50"><br>
                     <select class="form-control" name="clients_id">
                     [% FOREACH client in clients -%]
@@ -63,6 +64,7 @@
                     <input type="text" name="domains_id" placeholder="ID" class="input" size="50"><br>
                     <input type="text" name="domain" placeholder="Domain name" class="input" size="50"><br>
                     <input type="text" name="fqdn"   placeholder="fqdn of the domain" class="input" size="50"><br>
+                    <input type="text" name="port"   placeholder="Port number" class="input" size="50"><br>
                     <input type="text" name="image_url" placeholder="Image url" class="input" size="50"><br>
                     <select class="form-control" name="clients_id">
                     [% FOREACH client in clients -%]
@@ -89,8 +91,11 @@
                 <div class="col-md-2">
                     <b>Domain Name</b>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <b>FQDN</b>
+                </div>
+                <div class="col-md-1">
+                    <b>Port</b>
                 </div>
                 <div class="col-md-3">
                     <b>Image</b>
@@ -107,8 +112,11 @@
                 <div class="col-md-2">
                     [% dom.domain %]
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     [% dom.fqdn %]
+                </div>
+                <div class="col-md-1">
+                    [% dom.port %]
                 </div>
                 <div class="col-md-3">
                     [% dom.image_url %]
@@ -117,7 +125,7 @@
                     [% dom.client %]
                 </div>
                 <div class="col-md-1">
-                    <button onclick='editThis([% dom.domains_id %],"[% dom.domain %]","[% dom.fqdn %]","[% dom.image_url %]",[% dom.clients_id %])' class="btn btn-xs btn-info">
+                    <button onclick='editThis([% dom.domains_id %],"[% dom.domain %]","[% dom.fqdn %]",[% dom.port %],"[% dom.image_url %]",[% dom.clients_id %])' class="btn btn-xs btn-info">
                         <span class="glyphicon glyphicon-edit"></span>
                     </button>  
                 </div>

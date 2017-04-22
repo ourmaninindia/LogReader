@@ -82,6 +82,7 @@ CREATE TABLE domains (
 domains_id integer PRIMARY KEY,
 domain text,
 fqdn text,
+port integer,
 image_url,
 clients_id integer);
 
@@ -489,15 +490,16 @@ sub insert_domains
 {
     my $domain     = shift // '';
     my $fqdn       = shift // '';
+    my $port       = shift // 0;
     my $image_url  = shift // '1600x900.png';
     my $clients_id = shift // 0;
 
   return 0 unless (length($domain) != 0 );
 
-  my $qry = qq(INSERT INTO domains (domain,fqdn,image_url,clients_id) VALUES (?,?,?,?);); 
+  my $qry = qq(INSERT INTO domains (domain,fqdn,port,image_url,clients_id) VALUES (?,?,?,?,?);); 
 
   my $sth = database('sqlserver')->prepare($qry);
-     $sth->execute("$domain","$fqdn","$image_url",$clients_id) or die "Unable to insert.";
+     $sth->execute("$domain","$fqdn",$port,"$image_url",$clients_id) or die "Unable to insert.";
      $sth->finish;
 
   return 1; 
@@ -508,15 +510,16 @@ sub update_domains
   my $id         = shift // 0;
   my $domain     = shift // '';
   my $fqdn       = shift // '';
+  my $port       = shift // 0;
   my $image_url  = shift // '';
   my $clients_id = shift // '';
 
   return 0 unless ($id);
 
-  my $qry = q/UPDATE domains SET domain=?,fqdn=?,image_url=?,clients_id=? WHERE domains_id=?;/; 
+  my $qry = q/UPDATE domains SET domain=?,fqdn=?,port=?,image_url=?,clients_id=? WHERE domains_id=?;/; 
 
   my $sth = database('sqlserver')->prepare($qry);
-     $sth->execute("$domain","$fqdn","$image_url",$clients_id,$id) or die "Unable to update.";
+     $sth->execute("$domain","$fqdn",$port,"$image_url",$clients_id,$id) or die "Unable to update.";
      $sth->finish;
 
   return 1; 
@@ -733,6 +736,8 @@ sub insert_errorlogs
         # $field->{three}  = $vars[3];
         # $field->{four }  = $vars[4];
         # $body_bytes_sent = $vars2[0];
+
+        next if (index($request,'.well-known/a') != -1); # a known PHP google bot
         
         $sth->execute("$date","$status","$client","$server","$request","$method","$host","$error","$domain") 
             or die "Unable to insert.";

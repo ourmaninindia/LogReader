@@ -98,7 +98,7 @@
 </div>
 <br>
 <div>
-    <button onclick="clearFilter()" class="btn btn-md btn-primary "><span class="glyphicon glyphicon-off"></span></button>&nbsp;&nbsp;&nbsp;
+    <button onclick="clearFilter()" class="btn btn-md btn-primary data-toggle="tooltip" data-placement="top" title="Clear filter"><span class="glyphicon glyphicon-off"></span></button>&nbsp;&nbsp;&nbsp;
     <span style="border:1px solid blue; padding: 4px 5px 7px 5px;">
         <input type="radio" name="radioImage" value="1"[% IF xImage == 1 %] checked[% END %]> Images&nbsp;&nbsp;&nbsp;
         <input type="radio" name="radioImage" value="2"[% IF xImage == 2 %] checked[% END %]> Others&nbsp;&nbsp;&nbsp;
@@ -111,7 +111,7 @@
         <input type="radio" name="radioStatus" value="1"[% IF xStatus == 1 %] checked[% END %]> Error &nbsp;&nbsp;&nbsp;
         <input type="radio" name="radioStatus" value="2"[% IF xStatus == 2 %] checked[% END %]> Critic &nbsp;&nbsp;&nbsp;
     </span>&nbsp;&nbsp;&nbsp;
-    <button onclick="clickFilter()" class="btn btn-md btn-primary "><span class="glyphicon glyphicon-filter"></span></button>
+    <button onclick="clickFilter()" class="btn btn-md btn-primary data-toggle="tooltip" data-placement="right" title="Activate filter"><span class="glyphicon glyphicon-filter"></span></button>
 </div>
 <br>
 <div class="row">
@@ -348,6 +348,8 @@
         e.style.display = 'none';
     });
 
+    $().tooltip(options);
+    
 </script>
 </body>
 </html>
