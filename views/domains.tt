@@ -151,8 +151,9 @@
         var domains_id  = arguments[0];
         var domain      = arguments[1];
         var fqdn        = arguments[2];
-        var image_url   = arguments[3];
-        var clients_id  = arguments[4];
+        var port        = arguments[3]; 
+        var image_url   = arguments[4];
+        var clients_id  = arguments[5];
       
         var j = document.getElementById('jumbo');
         j.style.display = 'none';  
@@ -161,6 +162,7 @@
         document.forms["edit"]["domains_id"].value  = domains_id;
         document.forms["edit"]["domain"].value      = domain;
         document.forms["edit"]["fqdn"].value        = fqdn;
+        document.forms["edit"]["port"].value        = port;
         document.forms["edit"]["image_url"].value   = image_url;
         document.forms["edit"]["clients_id"].value  = clients_id;
     }
