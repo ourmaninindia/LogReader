@@ -737,7 +737,7 @@ sub insert_errorlogs
         # $field->{four }  = $vars[4];
         # $body_bytes_sent = $vars2[0];
 
-        next if (index($request,'.well-known/a') != -1); # a known PHP google bot
+        next if (index($request,'.well-known') > -1); # a known PHP google bot
         
         $sth->execute("$date","$status","$client","$server","$request","$method","$host","$error","$domain") 
             or die "Unable to insert.";
