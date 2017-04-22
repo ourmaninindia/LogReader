@@ -210,7 +210,7 @@ post '/domains/:option' => sub
 	}
 	elsif (params->{option} eq 'update')
 	{
-		update_domains(params->{domains_id},params->{domain},params->{fqdn},params->{image_url},params->{clients_id});
+		update_domains(params->{domains_id},params->{domain},params->{fqdn},params->{port},params->{image_url},params->{clients_id});
 	}
 
 	redirect '../domains';
