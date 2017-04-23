@@ -179,14 +179,8 @@ get '/domains' => sub
 	my @dirs=();
 	opendir(DIR, $NGINX_ERROR_LOG) or die "Can't opendir $NGINX_ERROR_LOG: $!";
  
- 	my @directories = 	map $_->[0], 
- 				sort {$a->[1] <=> $b->[1] || $a->[0] cmp $b->[0] } map [ $_, 
- 				-f "$NGINX_ERROR_LOG/$_" ], 
- 				readdir(DIR);
-	
-	while ( my $folder = shift @directories ) 
+    while (my $folder = readdir(DIR)) 
     {
-    	debug $folder;
 	    next if ($folder =~ /^..?$/);  # skip . and ..
 	    my $path = $NGINX_ERROR_LOG . '/' . $folder;
 	    next unless (-d $path);   # skip anything that isn't a directory
@@ -195,6 +189,8 @@ get '/domains' => sub
 
     closedir(DIR);
 
+    @dirs = sort @dirs;
+    
 	template domains => 
 	{ 
         domains     => domains(),
@@ -388,6 +384,7 @@ sub get_epoch {
 	if (defined $mm && $mm > 0) {
 		$standard_time = timelocal($sec, $min, $hour, $dd, $mm -1, ($yyyy - 1900));
 	} 
+	
 	return $standard_time;
 }
 
