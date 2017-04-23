@@ -136,10 +136,10 @@
 
 <form action="[% request.uri_base %]/error/[% domain %]/[% filtr %]/[% pageno %]/fix" method="POST">
     <div class="row">
-        <div class="col-md-1"><b>Date</b></div>
+        <div class="col-md-2"><b>Date</b></div>
         <div class="col-md-1"><b>Status</b></div>
         <div class="col-md-1"><b>method</b></div>
-        <div class="col-md-4"><b>Request</b></div>
+        <div class="col-md-3"><b>Request</b></div>
         <div class="col-md-2"><b>Client</b></div>
         <div class="col-md-2"><b>Host</b></div>
         <div class="col-md-1">
@@ -164,10 +164,10 @@
     [% FOREACH line IN data -%]
     <div class="[% IF loop.odd %]odd[% ELSE %]even[% END %]">
         <div class="row">
-            <div class="col-md-1">[% line.eudate      %]</div>
+            <div class="col-md-2">[% line.eudate      %]</div>
             <div class="col-md-1">[% line.status      %]</div>
             <div class="col-md-1">[% line.method      %]</div>
-            <div class="col-md-4 red">[% line.request %]</div>
+            <div class="col-md-3 red">[% line.request %]</div>
             <div class="col-md-2">
                 [% IF line.ua %]
                     [% line.ua %]   
