@@ -179,7 +179,7 @@ get '/domains' => sub
 	my @dirs=();
 	opendir(DIR, $NGINX_ERROR_LOG) or die "Can't opendir $NGINX_ERROR_LOG: $!";
  
-    while (my $sub_folders = readdir(DIR)) 
+    while (my $sub_folders = sort {$a <=> $b} readdir(DIR)) 
     {
 	    next if ($sub_folders =~ /^..?$/);  # skip . and ..
 	    my $path = $NGINX_ERROR_LOG . '/' . $sub_folders;
