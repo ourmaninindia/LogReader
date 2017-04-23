@@ -576,7 +576,7 @@ sub errorlogs
         $option .= " and status like 'crit' "; 
     }
  
-    my $qry  = "SELECT count(*) as cnt, strftime('%d-%m-%Y',date(e.date,'unixepoch')) as eudate, e.id as theid, * 
+    my $qry  = "SELECT count(*) as cnt, strftime('%d-%m-%Y %H:%M',date(e.date,'unixepoch')) as eudate, e.id as theid, * 
                     FROM error_log e LEFT JOIN bots on e.client = bots.ip 
                     WHERE domain like '$domain' $option 
                     GROUP BY request 
