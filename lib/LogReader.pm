@@ -179,12 +179,12 @@ get '/domains' => sub
 	my @dirs=();
 	opendir(DIR, $NGINX_ERROR_LOG) or die "Can't opendir $NGINX_ERROR_LOG: $!";
  
- 	my @dirs = 	map $_->[0], 
+ 	my @directories = 	map $_->[0], 
  				sort {$a->[1] <=> $b->[1] || $a->[0] cmp $b->[0] } map [ $_, 
  				-f "$NGINX_ERROR_LOG/$_" ], 
  				readdir(DIR);
 	
-	while ( my $folder = shift @dirs ) 
+	while ( my $folder = shift @directories ) 
     {
     	debug $folder;
 	    next if ($folder =~ /^..?$/);  # skip . and ..
