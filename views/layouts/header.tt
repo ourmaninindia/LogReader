@@ -30,7 +30,7 @@
   <meta name="google-signin-scope" content="https://www.googleapis.com/auth/analytics.readonly">
 
 <style>
-  .dash {background-color: #000; margin-top: 70px}
+  body.dash {background-color: #000; margin-top: 70px}
   .dash p {color: antiquewhite;}
   .list{ list-style: none;}
   li{margin: 15px 0; font-size: 19px; margin-top: 10px;}
@@ -65,4 +65,4 @@
   .domains{margin-top: 20px;}
 </style>
   </head>
-  <body>
+  

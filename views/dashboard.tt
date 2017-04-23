@@ -1,5 +1,5 @@
 [% INCLUDE layouts/header.tt %]
-    <div class="dash">
+<body class="dash">
     <div class="container">
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="row">
@@ -65,7 +65,6 @@
                 </div>
             </div>
         </div>
-    </div>
     </div>
     [% INCLUDE layouts/footer.tt %]    
 
