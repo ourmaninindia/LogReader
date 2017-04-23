@@ -381,7 +381,11 @@ debug "$date $time";
 	my ($yyyy, $mm,  $dd ) = (split /\//,$date)[0,1,2];
 	my ($hour, $min, $sec) = (split /:/ ,$time)[0,1,2];
 
+
 	if (defined $mm && $mm > 0) {
+
+		debug "$hour:$min";
+
 		$standard_time = timelocal($sec, $min, $hour, $dd, $mm -1, ($yyyy - 1900));
 	} 
 	
