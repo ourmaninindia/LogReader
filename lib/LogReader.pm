@@ -190,7 +190,7 @@ get '/domains' => sub
     closedir(DIR);
 
     @dirs = sort @dirs;
-    
+
 	template domains => 
 	{ 
         domains     => domains(),
@@ -204,7 +204,7 @@ post '/domains/:option' => sub
 {
 	if (params->{option} eq 'add')
 	{ 
-		insert_domains(params->{domain},params->{fqdn},params->{image_url},params->{clients_id});
+		insert_domains(params->{domain},params->{fqdn},params->{port},params->{image_url},params->{clients_id});
 	} 
 	elsif (params->{option} eq 'del')
 	{ 
