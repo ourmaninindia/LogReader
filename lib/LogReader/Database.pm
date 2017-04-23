@@ -686,7 +686,9 @@ sub insert_errorlogs
 
       # determine the date of this entry
       my $thisdate = LogReader::get_epoch( $vars[0], $vars[1] ); 
-      # not all logs have a date
+      my $date     = $thisdate;
+      debug "this date=$date last date = $lastdate";
+      # not all logs have a date     
       $thisdate = time() unless $thisdate > 0;
       # only enter new data
       next if ($thisdate < $lastdate);
@@ -697,9 +699,7 @@ sub insert_errorlogs
         LogReader::session( 'progress' => (int($counter / $progress_total * 100)) ) ;
         $application->session_engine->flush( session => $my_session );
       }
-
-      my $date      = LogReader::get_epoch( $vars[0], $vars[1] );
-
+      
       my $status    = $vars[2] // '';
          $status    =~ s/[\[\]]//g;
 
