@@ -619,7 +619,7 @@ sub numrows_errorlogs
  
     my  $qry  =  "SELECT  count(*) as numrows, 
                           strftime('%d-%m-%Y',date(min(firstdate),'unixepoch')) as firstdate, 
-                          strftime('%d-%m-%Y',date(max(lastdate),'unixepoch')) as lastdate 
+                          strftime('%d-%m-%Y HH:MM',date(max(lastdate),'unixepoch')) as lastdate 
                   FROM 
                   (
                     SELECT  min(e.date) as firstdate, 
