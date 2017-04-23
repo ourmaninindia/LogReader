@@ -497,18 +497,20 @@ sub insert_domains
     my $domain     = shift // '';
     my $fqdn       = shift // '';
     my $port       = shift // 0;
-    my $image_url  = shift // '1600x900.png';
+    my $image_url  = shift ;
     my $clients_id = shift // 0;
 
-  return 0 unless (length($domain) != 0 );
+    $image_url = 'placeholder.png' unless (len($image_url) > 0);
 
-  my $qry = qq(INSERT INTO domains (domain,fqdn,port,image_url,clients_id) VALUES (?,?,?,?,?);); 
+    return 0 unless (length($domain) != 0 );
 
-  my $sth = database('sqlserver')->prepare($qry);
-     $sth->execute("$domain","$fqdn",$port,"$image_url",$clients_id) or die "Unable to insert.";
-     $sth->finish;
+    my $qry = qq(INSERT INTO domains (domain,fqdn,port,image_url,clients_id) VALUES (?,?,?,?,?);); 
 
-  return 1; 
+    my $sth = database('sqlserver')->prepare($qry);
+       $sth->execute("$domain","$fqdn",$port,"$image_url",$clients_id) or die "Unable to insert.";
+       $sth->finish;
+
+    return 1; 
 }
 
 sub update_domains 
