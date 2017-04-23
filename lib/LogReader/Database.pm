@@ -208,8 +208,8 @@ sub numrows_accesslogs
                         strftime('%d-%m-%Y %H:%M',datetime(max(lastdate ),'unixepoch')) as lastdate 
                 FROM 
                 (
-                  SELECT  datetime(min(date) as firstdate, 
-                          datetime(max(date) as lastdate  
+                  SELECT  datetime(min(date)) as firstdate, 
+                          datetime(max(date)) as lastdate  
                   FROM    access_log 
                   WHERE   domain like ? $option 
                 )";
