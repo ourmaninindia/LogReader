@@ -57,6 +57,10 @@
                             [% IF dom.up == 1 %]up[% ELSE %]down[% END %] 
                         </div>
                     </div>
+                    [% IF mod(loop.count,4) == 0 %]
+                    </div>
+                    <div class="row">
+                    [% END %]
                     [% END %]
                 </div>
             </div>
