@@ -80,20 +80,17 @@
 [% IF alert.type == "danger"  %]<div class = "alert alert-danger" >[% alert.message %]</div>[% END %]
 <!-- data columns -->
 <div class="row">
-    <div class="col-md-1">
+    <div class="col-md-2">
         <b>First date</b> <br>[% records.firstdate %]
     </div>
-    <div class="col-md-1">
+    <div class="col-md-2">
         <b>Updated</b><br> [% records.lastdate %]
     </div>
-    <div class="col-md-1">
+    <div class="col-md-2">
         <b>Records</b><br> [% records.numrows %]
     </div>
-    <div class="col-md-1">
+    <div class="col-md-6">
         &nbsp;
-    </div>
-    <div class="col-md-8">
-        &nbsp;   
     </div>
 </div>
 <br>
