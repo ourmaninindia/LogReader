@@ -483,12 +483,13 @@ sub delete_clients
     return 1; 
 }
 
-
-
-
 sub domains 
 {
-    return database('sqlserver')->selectall_arrayref( "SELECT * FROM domains d LEFT JOIN clients c ON d.clients_id=c.clients_id order by client,domain", { Slice => {} } );
+    return database('sqlserver')->selectall_arrayref
+      ( 
+        "SELECT * FROM domains d LEFT JOIN clients c ON d.clients_id=c.clients_id 
+        ORDER BY client,domain", { Slice => {} } 
+      );
 }
 
 sub insert_domains 
@@ -696,8 +697,6 @@ sub insert_errorlogs
       $thisdate = time() unless $thisdate > 0;
       # only enter new data
       next if ($thisdate < $lastdate);
-      
-debug $vars[0]." this date=$date last date = $lastdate";
       
       # update the progress session to monitor the progress
       if (($counter%100) == 0) 

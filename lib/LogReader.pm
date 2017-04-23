@@ -180,6 +180,7 @@ get '/domains' => sub
 	opendir(DIR, $NGINX_ERROR_LOG) or die "Can't opendir $NGINX_ERROR_LOG: $!";
  
  	my @files = sort { $a <=> $b } readdir(DIR);
+ 	debug to_dumper(@files);
 	while ( my $folder = shift @files ) 
     {
     	debug $folder;
