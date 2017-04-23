@@ -375,6 +375,7 @@ sub get_epoch {
 	my $date = shift // '00-00-0000';
 	my $time = shift // '0:0:0';
 
+debug "$date $time";
 	my $standard_time = 0;
 
 	my ($yyyy, $mm,  $dd ) = (split /\//,$date)[0,1,2];
