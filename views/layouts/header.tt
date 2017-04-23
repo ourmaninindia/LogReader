@@ -30,28 +30,39 @@
   <meta name="google-signin-scope" content="https://www.googleapis.com/auth/analytics.readonly">
 
 <style>
-.container {width:auto;margin-bottom: 80px}
-.right {text-align: right;}
-.red {color: red;}
-.odd  {background-color: lightgray;}
-section#content {font-size: 12px;}
-.alert { color: black;}
-.jumbotron { padding-bottom: 15px; padding-top: 40px; margin-bottom: 0}
-#jumbo{display: none;color: inherit;background-color: #eee;margin-top:70px;}
-#edit {display: none;color: inherit;background-color: #eee;margin-top:70px;}
-.nopadding { padding-left: 0; padding-right: 0;}
-.xtoggle-row {display: none}
-#filter {width: 100%;}
-.spacing{margin-top:70px;}
-.navbar-right{margin-right: 15px;}
-p.copyright{color: lightgray; margin-top:10px; margin-left: 10px;}
-.aliceblue {background-color: aliceblue; }
-h3{margin-bottom: 20px;}
-.redbg{background-color: red;width:100%; text-align: center;}
-.greenbg{background-color: green; width:100%; text-align: center;}
-img{width:100%;height: auto; }
-.domains{margin-top: 20px;}
-
+  .dash {background-color: #000; margin-top: 70px}
+  .dash p {color: antiquewhite;}
+  .list{ list-style: none;}
+  li{margin: 15px 0; font-size: 19px; margin-top: 10px;}
+  a, h1 {color: lightgray;}
+  li a.active {color: #252830;
+    cursor: default;
+    background-color: #1997c6;
+    border-radius: 0.25rem;
+    display: block;
+    padding: 7px 15px;}
+  .sidebar {margin-right:20px;}
+  .container {width:auto;margin-bottom: 80px}
+  .right {text-align: right;}
+  .red {color: red;}
+  .odd  {background-color: lightgray;}
+  section#content {font-size: 12px;}
+  .alert { color: black;}
+  .jumbotron { padding-bottom: 15px; padding-top: 40px; margin-bottom: 0}
+  #jumbo{display: none;color: inherit;background-color: #eee;margin-top:70px;}
+  #edit {display: none;color: inherit;background-color: #eee;margin-top:70px;}
+  .nopadding { padding-left: 0; padding-right: 0;}
+  .xtoggle-row {display: none}
+  #filter {width: 100%;}
+  .spacing{margin-top:70px;}
+  .navbar-right{margin-right: 15px;}
+  p.copyright{color: lightgray; margin-top:10px; margin-left: 10px;}
+  .aliceblue {background-color: aliceblue; }
+  h3{margin-bottom: 20px;}
+  .redbg{background-color: red;width:100%; text-align: center;}
+  .greenbg{background-color: green; width:100%; text-align: center;}
+  img{width:100%;height: auto; }
+  .domains{margin-top: 20px;}
 </style>
   </head>
   <body>

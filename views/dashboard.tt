@@ -1,21 +1,5 @@
 [% INCLUDE layouts/header.tt %]
-
-<style>
-    body {background-color: #000; margin-top: 70px}
-    .container {width:auto;}
-    p {color: antiquewhite;}
-    .list{ list-style: none;}
-    li{margin: 15px 0; font-size: 19px; margin-top: 10px;}
-    a, h1 {color: lightgray;}
-    li a.active {color: #252830;
-    cursor: default;
-    background-color: #1997c6;
-    border-radius: 0.25rem;
-    display: block;
-    padding: 7px 15px;}
-    .sidebar {margin-right:20px;}
-</style>
-
+    <div class="dash">
     <div class="container">
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="row">
@@ -60,16 +44,11 @@
             <div class="col-md-9">
                 <h1>Dashboard</h1>
                 <hr>
-
-<!-- The Sign-in button. This will run `queryReports()` on success. 
-<div class="g-signin2" data-onsuccess="queryReports"></div>
-<textarea cols="80" rows="20" id="query-output"></textarea>
--->
                 <div class="row">
                     [% FOREACH dom in domains -%]
                     <div class="col-md-3  domains">
                         <div>
-                            <img src="../images/[% dom.image_url %]" alt="home page">
+                            <a href="http://log.traveljadoo.com/[% dom.domain %]"><img src="../images/[% dom.image_url %]" alt="home page"></a>
                         </div>
                         <div>
                             <a href="[% dom.fqdn %]" target="_blank">[% dom.domain %]</a>
@@ -82,6 +61,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
     [% INCLUDE layouts/footer.tt %]    
 
