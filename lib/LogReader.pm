@@ -375,20 +375,13 @@ sub get_epoch {
 	my $date = shift // '00-00-0000';
 	my $time = shift // '0:0:0';
 
-debug "$date $time";
-	my $standard_time = 0;
-
+	my $standard_time 	   = 0;
 	my ($yyyy, $mm,  $dd ) = (split /\//,$date)[0,1,2];
 	my ($hour, $min, $sec) = (split /:/ ,$time)[0,1,2];
 
-
 	if (defined $mm && $mm > 0) {
-
-		debug "$hour:$min";
-
 		$standard_time = timelocal($sec, $min, $hour, $dd, $mm -1, ($yyyy - 1900));
 	} 
-	
 	return $standard_time;
 }
 

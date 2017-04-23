@@ -163,7 +163,7 @@ sub accesslogs
         $option .= ' and status = '.substr($filterurl,2,3).' '; 
     }
  
-    my $qry  = "SELECT count(*) as cnt, strftime('%d-%m-%Y',date(a.date,'unixepoch')) as eudate, a.id as theid, 
+    my $qry  = "SELECT count(*) as cnt, strftime('%d-%m-%Y %H:%M',datetime(a.date,'unixepoch')) as eudate, a.id as theid, 
                     date,status,a.ua,a.ip,host,request,method,protocol,domain,size, bots.ua as bot 
                     FROM access_log a LEFT JOIN bots on a.ip = bots.ip 
                     WHERE domain like '$domain' $option 
@@ -204,13 +204,13 @@ sub numrows_accesslogs
     }
  
     my  $qry = "SELECT  count(*) as numrows, 
-                        strftime('%d-%m-%Y',date(min(firstdate),'unixepoch')) as firstdate, 
-                        strftime('%d-%m-%Y',date(max(lastdate),'unixepoch')) as lastdate 
+                        strftime('%d-%m-%Y %H:%M',datetime(min(firstdate),'unixepoch')) as firstdate, 
+                        strftime('%d-%m-%Y %H:%M',datetime(max(lastdate ),'unixepoch')) as lastdate 
                 FROM 
                 (
                   SELECT  count(*) as numrows,  
-                          date(min(date) as firstdate, 
-                          date(max(date) as lastdate  
+                          datetime(min(date) as firstdate, 
+                          datetime(max(date) as lastdate  
                   FROM    access_log 
                   WHERE   domain like ? $option 
                 )";
@@ -323,7 +323,10 @@ sub update_accesslogs
     my $alert;
     my $i       = 0;
       
-    my $qry = q/DELETE FROM access_log WHERE domain like ? and request = (SELECT request FROM error_log WHERE domain like ? and id = ?)/;
+    my $qry = q/DELETE FROM access_log WHERE domain like ? and request = 
+      (
+        SELECT request FROM error_log WHERE domain like ? and id = ?
+      )/;
     my $sth = database('sqlserver')->prepare($qry);
         
     if ( ref($ids[0]) ne 'ARRAY') {
@@ -358,7 +361,9 @@ sub update_accesslogs
 
 sub bots 
 {
-    return database('sqlserver')->selectall_arrayref( "SELECT strftime('%d-%m-%Y',date(datum,'unixepoch')) as eudate, * from bots order by bots_id", { Slice => {} } );
+    return database('sqlserver')->selectall_arrayref( "SELECT 
+      strftime('%d-%m-%Y %H:%M',datetime(datum,'unixepoch')) as eudate, 
+      * FROM bots ORDER BY bots_id", { Slice => {} } );
 }
 
 sub get_id_bots 
@@ -576,7 +581,7 @@ sub errorlogs
         $option .= " and status like 'crit' "; 
     }
  
-    my $qry  = "SELECT count(*) as cnt, strftime('%d-%m-%Y %H:%M',date(e.date,'unixepoch')) as eudate, e.id as theid, * 
+    my $qry  = "SELECT count(*) as cnt, strftime('%d-%m-%Y %H:%M',datetime(e.date,'unixepoch')) as eudate, e.id as theid, * 
                     FROM error_log e LEFT JOIN bots on e.client = bots.ip 
                     WHERE domain like '$domain' $option 
                     GROUP BY request 
@@ -618,8 +623,8 @@ sub numrows_errorlogs
     }
  
     my  $qry  =  "SELECT  count(*) as numrows, 
-                          strftime('%d-%m-%Y',date(min(firstdate),'unixepoch')) as firstdate, 
-                          strftime('%d-%m-%Y %H:%M',date(max(lastdate),'unixepoch')) as lastdate 
+                          strftime('%d-%m-%Y %H:%M',datetime(min(firstdate),'unixepoch')) as firstdate, 
+                          strftime('%d-%m-%Y %H:%M',datetime(max(lastdate ),'unixepoch')) as lastdate 
                   FROM 
                   (
                     SELECT  min(e.date) as firstdate, 
