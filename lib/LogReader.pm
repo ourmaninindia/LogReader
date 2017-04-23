@@ -180,12 +180,13 @@ get '/domains' => sub
 	opendir(DIR, $NGINX_ERROR_LOG) or die "Can't opendir $NGINX_ERROR_LOG: $!";
  
  	my @files = sort { $a <=> $b } readdir(DIR);
-	while ( my $sub_folders = shift @files ) 
+	while ( my $folder = shift @files ) 
     {
-	    next if ($sub_folders =~ /^..?$/);  # skip . and ..
-	    my $path = $NGINX_ERROR_LOG . '/' . $sub_folders;
+    	debug $folder;
+	    next if ($folder =~ /^..?$/);  # skip . and ..
+	    my $path = $NGINX_ERROR_LOG . '/' . $folder;
 	    next unless (-d $path);   # skip anything that isn't a directory
-	    push @dirs, $sub_folders;
+	    push @dirs, $folder;
     }
 
     closedir(DIR);
