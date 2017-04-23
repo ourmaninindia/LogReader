@@ -687,12 +687,13 @@ sub insert_errorlogs
       # determine the date of this entry
       my $thisdate = LogReader::get_epoch( $vars[0], $vars[1] ); 
       my $date     = $thisdate;
-      debug "this date=$date last date = $lastdate";
       # not all logs have a date     
       $thisdate = time() unless $thisdate > 0;
       # only enter new data
       next if ($thisdate < $lastdate);
-
+      
+debug $vars[0]." this date=$date last date = $lastdate";
+      
       # update the progress session to monitor the progress
       if (($counter%100) == 0) 
       {
