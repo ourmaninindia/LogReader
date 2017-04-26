@@ -331,18 +331,7 @@ sub update_accesslogs
     my $sth = database('sqlserver')->prepare($qry);      
 debug $qry;
     if ( ref($ids[0]) ne 'ARRAY') {
-        debug @ids;
-        eval { $sth->execute($domain,$domain,@ids) };
-        $alert->{message} = "Deleted @ids";  
-        
-        if ($@) { 
-debug $@;
-            $error = 1;
-            $alert->{message} = "Unable to delete @ids";  
-            $alert->{type}    = 'Warning';
-        }
-        $sth->finish;
-debug 'result='. $@;
+        $sth->execute($domain,$domain,@ids) or die "Unable to update @ids";
     }
     else {
         while ($ids[0][$i] > 0 ) 
