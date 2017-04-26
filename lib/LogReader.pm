@@ -87,6 +87,7 @@ any [ 'get', 'post' ] => '/access/*/**' => sub
 		my $date = get_epoch_from_eu(params->{deletedate});
 		$alert = delete_accesslogs( $domain, $date );
 	} elsif ($fix eq 'fix'){
+		debug 'fix';
 		$alert = update_accesslogs(params->{fix},$domain );
 	};
 
