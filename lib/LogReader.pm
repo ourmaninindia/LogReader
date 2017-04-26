@@ -58,6 +58,7 @@ post '/access/domain' => sub
 	redirect '../access/'.params->{domain}.'/000';
 };
 
+
 any [ 'get', 'post' ] => '/access/*/**' => sub 
 { 
 	# variables passed
@@ -85,7 +86,7 @@ any [ 'get', 'post' ] => '/access/*/**' => sub
 	} elsif ($fix eq 'delete')	{
 		my $date = get_epoch_from_eu(params->{deletedate});
 		$alert = delete_accesslogs( $domain, $date );
-	} elsif ($fix){
+	} elsif ($fix eq 'fix'){
 		$alert = update_accesslogs(params->{fix},$domain );
 	};
 
@@ -258,7 +259,7 @@ any [ 'get', 'post' ] => '/error/*/**' => sub
 	} elsif ($fix eq 'delete')	{
 		my $date 	= get_epoch_from_eu(params->{deletedate});
 		$alert 		= delete_errorlogs( $domain, $date, params->{deletedate} );
-	} elsif ($fix){
+	} elsif ($fix eq 'fix'){
 		$alert = update_errorlogs(params->{fix},$domain );
 	};
 
