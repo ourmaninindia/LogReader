@@ -342,7 +342,7 @@ debug $@;
             $alert->{type}    = 'Warning';
         }
         $sth->finish;
-
+debug 'result='. $@;
     }
     else {
         while ($ids[0][$i] > 0 ) 
