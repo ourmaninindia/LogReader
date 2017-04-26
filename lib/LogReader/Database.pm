@@ -329,14 +329,16 @@ sub update_accesslogs
         SELECT request FROM error_log WHERE domain like ? and id = ?
       )/;
     my $sth = database('sqlserver')->prepare($qry);      
-
+debug $qry;
     if ( ref($ids[0]) ne 'ARRAY') {
+        debug @ids;
         eval { $sth->execute($domain,$domain,@ids) or die "Unable to update. id: @ids";};
 
         if($@) { 
             $error = 1;
         }
         $sth->finish;
+
     }
     else {
         while ($ids[0][$i] > 0 ) 
