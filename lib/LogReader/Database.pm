@@ -332,10 +332,14 @@ sub update_accesslogs
 debug $qry;
     if ( ref($ids[0]) ne 'ARRAY') {
         debug @ids;
-        eval { $sth->execute($domain,$domain,@ids) or die "Unable to update. id: @ids";};
-
-        if($@) { 
+        eval { $sth->execute($domain,$domain,@ids) };
+        $alert->{message} = "Deleted @ids";  
+        
+        if ($@) { 
+debug $@;
             $error = 1;
+            $alert->{message} = "Unable to delete @ids";  
+            $alert->{type}    = 'Warning';
         }
         $sth->finish;
 
