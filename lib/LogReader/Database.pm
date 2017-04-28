@@ -182,27 +182,6 @@ sub numrows_accesslogs
     
     return 0 unless ($domain ne 'domain');
 
-    # filter on images
-    if (substr($filter,0,1) == 1) { 
-        $option .= " and RIGHT(request,4) = 'jpeg' OR RIGHT(request,3) IN ('jpg', 'gif', 'png', 'svg') ";
-    } 
-    elsif (substr($filter,0,1) == 2) {
-        $option .= " and RIGHT(request,4) <> 'jpeg' OR RIGHT(request,3) NOT IN ('jpg', 'gif', 'png','svg') ";
-    } 
-
-    # filter on bots
-    if (substr($filter,1,1)==1) { 
-        $option .= " and bots.ip is null"; 
-    }
-    elsif (substr($filter,1,1)==2){
-        $option .= " and bots.ip is not null"; 
-    }
-
-    # filter on status code  
-    if (substr($filter,2,3) > 0){ 
-        $option .= ' and status = '.substr($filter,2,3).' '; 
-    }
- 
     my  $qry = "SELECT  count(*) as numrows, 
                         strftime('%d-%m-%Y %H:%M',datetime(min(firstdate),'unixepoch')) as firstdate, 
                         strftime('%d-%m-%Y %H:%M',datetime(max(lastdate ),'unixepoch')) as lastdate 
