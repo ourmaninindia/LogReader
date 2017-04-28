@@ -24,7 +24,7 @@
                     </form>
                 </div>
             </div>
-             <div class="col-md-1">&nbsp;</div>
+            <div class="col-md-1">&nbsp;</div>
             <div class="col-md-1 navbar-form" id="toggle"> 
                 <button onclick="toggleRow();" class="btn btn-info btn-md "><span class="glyphicon glyphicon-resize-vertical"></span></button>
             </div>
@@ -220,7 +220,7 @@
 </div>
 [% INCLUDE layouts/footer.tt %]     
 
-    <script type="text/javascript">
+<script type="text/javascript">
 
     function dnslookup(data) {
         var xhr = new XMLHttpRequest();
