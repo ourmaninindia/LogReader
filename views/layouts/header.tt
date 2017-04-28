@@ -34,7 +34,8 @@
   .dash p {color: antiquewhite;}
   .list{ list-style: none;}
   li{margin: 15px 0; font-size: 19px; margin-top: 10px;}
-  a, h1 {color: lightgray;}
+  h1 {color: lightgray;}
+  ul a {color: lightgray;}
   li a.active {color: #252830;
     cursor: default;
     background-color: #1997c6;
