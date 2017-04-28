@@ -287,8 +287,8 @@ sub insert_accesslogs
         my $date      = $thisdate // time();
 
         my @parts   = split /"/,$line,9;
-        my $part    = $parts[2];
-        my ($status,$size) = split / /,$part,2;
+        debug to_dumper($parts[2]);
+        my ($status,$size) = split / /,$parts[2];
 
         # only enter new data
         next if ($thisdate < $lastdate);
