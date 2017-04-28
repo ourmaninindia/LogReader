@@ -116,7 +116,8 @@ any [ 'get', 'post' ] => '/access/*/**' => sub
         xImage  	=> $xImage,
         xBot        => $xBot,
         xStatus		=> $xStatus,
-        codes 		=> codes_accesslogs($domain),	
+        codes 		=> codes_accesslogs($domain),
+        numrows     => $data[0]->{cnt},	
     };
 };
 
