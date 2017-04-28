@@ -153,10 +153,10 @@
                     </div>
                 </div>
             </div>
-        <div class="col-md-1"><b>IP</b></div>
         <div class="col-md-4"><b>Request</b></div>
         <div class="col-md-2"><b>UA</b></div>
         <div class="col-md-2"><b>Host</b></div>
+        <div class="col-md-1"><b>IP</b></div>
         <div class="col-md-1">
             <div class="row">
                 <div class="col-md-6">
@@ -190,9 +190,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-1"><a onclick="dnslookup('[% line.ip %]')" href="#">[% line.ip %]</a></div>
             <div class="col-md-4 red">[% line.request %]</div>
             <div class="col-md-4">[% line.host %]</div>
+            <div class="col-md-1"><a onclick="dnslookup('[% line.ip %]')" href="#">[% line.ip %]</a></div>
             <div class="col-md-1">
                 <div class="row">
                     <div class="col-md-6">

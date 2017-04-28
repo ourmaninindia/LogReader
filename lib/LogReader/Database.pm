@@ -287,19 +287,12 @@ sub insert_accesslogs
         my $date      = $thisdate // time();
 
         my @parts   = split /"/,$line,9;
-        debug to_dumper($parts[2]);
         $parts[2] =~ s/^\s+|\s+$//g ; # left and right trim
         my ($status,$size) = split / /,$parts[2];
 
         # only enter new data
         next if ($thisdate < $lastdate);
 
-debug $line;
-my $test = "date=$date,status=$status,ua=$ua,ip=$ip,host=$host,request=$request,method=$method,prot=$protocol,domain=$domain,size=$size";
-debug $test;
-if ($status == '-'){
-  die "problem ";
-}
         # update the progress session to monitor the progress
         if (($counter%100) == 0) {
             LogReader::session( 'progress' => (int($counter / $progress_total * 100)) ) ;
