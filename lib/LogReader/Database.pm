@@ -272,12 +272,9 @@ sub insert_accesslogs
     {
         $counter += 1; 
 
-        # start splittng the line into fields
+        # start splitting the line into fields
         my @vars    = split / /, $line, 9;
         my $ip      = $vars[0]; 
-        my @status  = split / /,$vars[8];
-        my $size    = $status[1];
-        my $status  = $status[0];
         my @quotes  = $line =~ /"([^"]*)"/g;
         my $host    = $quotes[1];
         my $ua      = $quotes[2];
@@ -288,6 +285,10 @@ sub insert_accesslogs
         my ($yyyy,$hour,$min,$sec) = split /:/,$year;
         my $thisdate  = LogReader::timelocal($sec, $min, $hour, $dd, LogReader::month2num($mm) -1, ($yyyy - 1900));
         my $date      = $thisdate // time();
+
+        my @parts   = split /"/,$line,9;
+        my $part    = $parts[2];
+        my ($status,$size) = split / /,$part,2;
 
         # only enter new data
         next if ($thisdate < $lastdate);

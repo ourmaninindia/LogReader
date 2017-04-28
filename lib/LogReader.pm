@@ -12,7 +12,7 @@ use POSIX qw/ceil/;
 use Time::Local;
 use Socket;
 use LWP::UserAgent;
-#use LWP::Protocol::https;
+use LWP::Protocol::https;
 
 use open qw(:std :utf8);
 
