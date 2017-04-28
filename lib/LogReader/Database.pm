@@ -288,6 +288,7 @@ sub insert_accesslogs
 
         my @parts   = split /"/,$line,9;
         debug to_dumper($parts[2]);
+        $parts[2] =~ s/^\s+|\s+$//g ; # left and right trim
         my ($status,$size) = split / /,$parts[2];
 
         # only enter new data
