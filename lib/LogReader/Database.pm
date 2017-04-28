@@ -206,7 +206,7 @@ sub numrows_accesslogs
     $sth->execute($domain);
     my $row = $sth->fetchrow_hashref('NAME_lc');
     $sth->finish;
-
+debug to_dumper($row);
     return $row->{numrows};
 }
 
