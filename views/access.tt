@@ -89,7 +89,7 @@
         <b>Updated</b><br> [% records.lastdate %]
     </div>        
     <div class="col-md-1">
-        <b>Records</b><br> [% data.cnt %]
+        <b>Records</b><br> [% data[0].cnt %]
     </div>
     <div class="col-md-9">
         &nbsp;
