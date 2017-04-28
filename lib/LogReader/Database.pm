@@ -13,6 +13,7 @@ our @EXPORT = qw{
     accesslogs
     numrows_accesslogs
     codes_accesslogs
+    dates_accesslogs
     insert_accesslogs
     update_accesslogs
     delete_accesslogs
@@ -173,7 +174,6 @@ sub accesslogs
     return database('sqlserver')->selectall_arrayref( $qry, { Slice => {} } );
 }
 
-
 sub numrows_accesslogs 
 {
     my $domain      = shift // 'domain';
@@ -182,16 +182,48 @@ sub numrows_accesslogs
     
     return 0 unless ($domain ne 'domain');
 
-    my  $qry = "SELECT  count(*) as numrows, 
-                        strftime('%d-%m-%Y %H:%M',datetime(min(firstdate),'unixepoch')) as firstdate, 
+    # filter on images
+    if (substr($filterurl,0,1) == 1) { 
+        $option .= " and RIGHT(request,4) = 'jpeg' OR RIGHT(request,3) IN ('jpg', 'gif', 'png', 'svg') ";
+    } 
+    elsif (substr($filterurl,0,1) == 2) {
+        $option .= " and RIGHT(request,4) <> 'jpeg' OR RIGHT(request,3) NOT IN ('jpg', 'gif', 'png','svg') ";
+    } 
+
+    # filter on bots
+    if (substr($filterurl,1,1)==1) { 
+        $option .= " and bots.ip is null"; 
+    }
+    elsif (substr($filterurl,1,1)==2){
+        $option .= " and bots.ip is not null"; 
+    }
+  
+    # filter on status code
+    if (int(substr($filterurl,2,3)) > 0){ 
+        $option .= ' and status = '.substr($filterurl,2,3).' '; 
+    }
+ 
+    my  $qry = "SELECT count(*) as numrows FROM access_log a LEFT JOIN bots on a.ip = bots.ip 
+                WHERE domain like ? $option GROUP BY request, status;";
+
+    my $sth = database('sqlserver')->prepare($qry);
+    $sth->execute($domain);
+    my $row = $sth->fetchrow_hashref('NAME_lc');
+    $sth->finish;
+
+    return $row->{numrows};
+}
+
+
+sub dates_accesslogs 
+{
+    my $domain      = shift // 'domain';
+    
+    return 0 unless ($domain ne 'domain');
+
+    my  $qry = q/SELECT strftime('%d-%m-%Y %H:%M',datetime(min(firstdate),'unixepoch')) as firstdate, 
                         strftime('%d-%m-%Y %H:%M',datetime(max(lastdate ),'unixepoch')) as lastdate 
-                FROM 
-                (
-                  SELECT  min(date) as firstdate, 
-                          max(date) as lastdate  
-                  FROM    access_log 
-                  WHERE   domain like ? $option 
-                )";
+                FROM    access_log WHERE   domain like ?/;
 
     my $sth = database('sqlserver')->prepare($qry);
     $sth->execute($domain);

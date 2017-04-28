@@ -83,13 +83,13 @@
 <!-- data columns -->
 <div class="row">
     <div class="col-md-1">
-        <b>First date</b> <br>[% records.firstdate %]
+        <b>First date</b> <br>[% dates.firstdate %]
     </div>
     <div class="col-md-1">
-        <b>Updated</b><br> [% records.lastdate %]
+        <b>Updated</b><br> [% dates.lastdate %]
     </div>        
     <div class="col-md-1">
-        <b>Records</b><br> [% numrows %]
+        <b>Records</b><br> [% rows %]
     </div>
     <div class="col-md-9">
         &nbsp;

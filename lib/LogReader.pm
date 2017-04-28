@@ -93,15 +93,13 @@ any [ 'get', 'post' ] => '/access/*/**' => sub
 	if ($domain ne 'domain')	{
 		# domain has been selected, determine number of rows and pages
 	    $rows	  = numrows_accesslogs($domain,$filter);
-	    $lastpage = ceil($rows->{numrows}/$ROWS_PER_PAGE);
+	    $lastpage = ceil($rows/$ROWS_PER_PAGE);
 
 		# determine page number
 		if ($pageno  > $lastpage) { $pageno = $lastpage;} 
 		if ($pageno  < 1) 		  { $pageno = 1;} 
 	    @data = accesslogs($domain,$filter,$pageno);
 	}
-
-debug to_dumper( $data[0][0]->{cnt} );
 
     template access => 
     { 
@@ -119,7 +117,8 @@ debug to_dumper( $data[0][0]->{cnt} );
         xBot        => $xBot,
         xStatus		=> $xStatus,
         codes 		=> codes_accesslogs($domain),
-        numrows     => $data[0][0]->{cnt},	
+        dates 		=> dates_accesslogs($domain),
+        rows     	=> $rows,	
     };
 };
 
