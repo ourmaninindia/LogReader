@@ -292,6 +292,10 @@ sub insert_accesslogs
         # only enter new data
         next if ($thisdate < $lastdate);
 
+debug $line;
+my $test = "date=$date,status=$status,ua=$ua,ip=$ip,host=$host,request=$request,method=$method,prot=$protocol,domain=$domain,size=$size";
+debug $test;
+die if (index('"', $line) <> -1);
         # update the progress session to monitor the progress
         if (($counter%100) == 0) {
             LogReader::session( 'progress' => (int($counter / $progress_total * 100)) ) ;
