@@ -199,8 +199,13 @@ sub numrows_accesslogs
         $option .= ' and status = '.substr($filter,2,3).' '; 
     }
  
-    my  $qry = "SELECT count(*) as numrows,a.id FROM access_log a LEFT JOIN bots on a.ip = bots.ip 
-                WHERE domain like ? $option GROUP BY request, status;";
+    my  $qry = "SELECT count(*) as numrows 
+                FROM 
+                (
+                  SELECT    request FROM access_log a LEFT JOIN bots on a.ip = bots.ip 
+                  WHERE     domain like ? $option 
+                  GROUP BY  request, status
+                );";
 
     my $sth = database('sqlserver')->prepare($qry);
     $sth->execute($domain);
