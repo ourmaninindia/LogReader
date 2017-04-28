@@ -205,7 +205,7 @@ sub numrows_accesslogs
  
     my  $qry = "SELECT count(*) as numrows FROM access_log a LEFT JOIN bots on a.ip = bots.ip 
                 WHERE domain like ? $option GROUP BY request, status;";
-
+debug $qry;
     my $sth = database('sqlserver')->prepare($qry);
     $sth->execute($domain);
     my $row = $sth->fetchrow_hashref('NAME_lc');
@@ -303,6 +303,7 @@ sub insert_accesslogs
 
         # only enter new data
         next if ($thisdate < $lastdate);
+        next if (index($request,'.well-known') > -1); # a known PHP google bot
 
         # update the progress session to monitor the progress
         if (($counter%100) == 0) {
@@ -340,8 +341,8 @@ sub update_accesslogs
       (
         SELECT request FROM error_log WHERE domain like ? and id = ?
       )/;
-    my $sth = database('sqlserver')->prepare($qry);      
-debug $qry;
+    my $sth = database('sqlserver')->prepare($qry);
+
     if ( ref($ids[0]) ne 'ARRAY') {
         $sth->execute($domain,$domain,@ids) or die "Unable to update @ids";
     }
