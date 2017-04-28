@@ -101,6 +101,8 @@ any [ 'get', 'post' ] => '/access/*/**' => sub
 	    @data = accesslogs($domain,$filter,$pageno);
 	}
 
+debug to_dumper(@data[0]);
+
     template access => 
     { 
     	pageno   	=> $pageno,
@@ -117,7 +119,7 @@ any [ 'get', 'post' ] => '/access/*/**' => sub
         xBot        => $xBot,
         xStatus		=> $xStatus,
         codes 		=> codes_accesslogs($domain),
-        numrows     => $data[0]->{cnt},	
+        numrows     => 0,	
     };
 };
 
