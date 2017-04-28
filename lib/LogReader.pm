@@ -101,7 +101,7 @@ any [ 'get', 'post' ] => '/access/*/**' => sub
 	    @data = accesslogs($domain,$filter,$pageno);
 	}
 
-debug to_dumper(@data[0]);
+debug to_dumper(@data[0][0]);
 
     template access => 
     { 
