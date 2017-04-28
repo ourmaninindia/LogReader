@@ -221,8 +221,8 @@ sub dates_accesslogs
     
     return 0 unless ($domain ne 'domain');
 
-    my  $qry = q/SELECT strftime('%d-%m-%Y %H:%M',datetime(min(firstdate),'unixepoch')) as firstdate, 
-                        strftime('%d-%m-%Y %H:%M',datetime(max(lastdate ),'unixepoch')) as lastdate 
+    my  $qry = q/SELECT strftime('%d-%m-%Y %H:%M',datetime(min(date) ,'unixepoch')) as firstdate, 
+                        strftime('%d-%m-%Y %H:%M',datetime(max(date ),'unixepoch')) as lastdate 
                 FROM    access_log WHERE   domain like ?/;
 
     my $sth = database('sqlserver')->prepare($qry);
