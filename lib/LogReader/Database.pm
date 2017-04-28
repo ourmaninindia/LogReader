@@ -167,7 +167,7 @@ sub accesslogs
                     date,status,a.ua,a.ip,host,request,method,protocol,domain,size, bots.ua as bot 
                     FROM access_log a LEFT JOIN bots on a.ip = bots.ip 
                     WHERE domain like '$domain' $option 
-                    GROUP BY request 
+                    GROUP BY request, status 
                     ORDER BY a.date DESC LIMIT " .($pageno - 1) * $LogReader::ROWS_PER_PAGE .','. $LogReader::ROWS_PER_PAGE;
 
     return database('sqlserver')->selectall_arrayref( $qry, { Slice => {} } );
@@ -295,7 +295,7 @@ sub insert_accesslogs
 debug $line;
 my $test = "date=$date,status=$status,ua=$ua,ip=$ip,host=$host,request=$request,method=$method,prot=$protocol,domain=$domain,size=$size";
 debug $test;
-my $pos = index($line, '\"');
+my $pos = index($line, '-');
 if ($pos != -1){
   die "problem at $pos";
 }
