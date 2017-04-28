@@ -134,9 +134,9 @@
     <a href='[% request.uri_base %]/access/[% domain %]/[% filtr %]/[% lastpage %]'>LAST</a>
     [% END %]
     </div>
-    <div class="col-md-1"></div>
-    <div class="col-md-2 red" id="hostname"></div>
     <div class="col-md-2"></div>
+    <div class="col-md-2 red" id="hostname"></div>
+    <div class="col-md-1"></div>
 </div>
 
 <form action="[% request.uri_base %]/access/[% domain %]/[% filtr %]/[% pageno %]/fix" method="POST">
