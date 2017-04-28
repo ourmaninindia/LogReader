@@ -295,8 +295,9 @@ sub insert_accesslogs
 debug $line;
 my $test = "date=$date,status=$status,ua=$ua,ip=$ip,host=$host,request=$request,method=$method,prot=$protocol,domain=$domain,size=$size";
 debug $test;
-if (index($line, '"') != -1){
-  die 'problem';
+my $pos = index($line, '\"');
+if ($pos != -1){
+  die "problem at $pos";
 }
         # update the progress session to monitor the progress
         if (($counter%100) == 0) {
