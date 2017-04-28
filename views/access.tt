@@ -154,8 +154,7 @@
                 </div>
             </div>
         <div class="col-md-4"><b>Request</b></div>
-        <div class="col-md-2"><b>UA</b></div>
-        <div class="col-md-2"><b>Host</b></div>
+        <div class="col-md-4"><b>Host</b></div>
         <div class="col-md-1"><b>IP</b></div>
         <div class="col-md-1">
             <div class="row">
