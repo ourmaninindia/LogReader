@@ -135,33 +135,33 @@ awk -F\" '($2 ~ "ref"){print $2}' access.log | awk '{print $2}' | sort | uniq -c
 
 sub accesslogs 
 {
-  my $domain      = shift // 'domain';
-  my $filterurl   = shift // '00000';
-  my $pageno      = shift // 1; 
+  my $domain   = shift // 'domain';
+  my $filter   = shift // '00000';
+  my $pageno   = shift // 1; 
   
-  my $option      = '';
-  my @array       = ();
+  my $option   = '';
+  my @array    = ();
 
     return @array unless ($domain ne 'domain');
     # filter on images
-    if (substr($filterurl,0,1) == 1) { 
+    if (substr($filter,0,1) == 1) { 
         $option .= " and RIGHT(request,4) = 'jpeg' OR RIGHT(request,3) IN ('jpg', 'gif', 'png', 'svg') ";
     } 
-    elsif (substr($filterurl,0,1) == 2) {
+    elsif (substr($filter,0,1) == 2) {
         $option .= " and RIGHT(request,4) <> 'jpeg' OR RIGHT(request,3) NOT IN ('jpg', 'gif', 'png','svg') ";
     } 
 
     # filter on bots
-    if (substr($filterurl,1,1)==1) { 
+    if (substr($filter,1,1)==1) { 
         $option .= " and bots.ip is null"; 
     }
-    elsif (substr($filterurl,1,1)==2){
+    elsif (substr($filter,1,1)==2){
         $option .= " and bots.ip is not null"; 
     }
   
     # filter on status code
-    if (int(substr($filterurl,2,3)) > 0){ 
-        $option .= ' and status = '.substr($filterurl,2,3).' '; 
+    if (int(substr($filter,2,3)) > 0){ 
+        $option .= ' and status = '.substr($filter,2,3).' '; 
     }
  
     my $qry  = "SELECT count(*) as cnt, strftime('%d-%m-%Y %H:%M',datetime(a.date,'unixepoch')) as eudate, a.id as theid, 
@@ -183,24 +183,24 @@ sub numrows_accesslogs
     return 0 unless ($domain ne 'domain');
 
     # filter on images
-    if (substr($filterurl,0,1) == 1) { 
+    if (substr($filter,0,1) == 1) { 
         $option .= " and RIGHT(request,4) = 'jpeg' OR RIGHT(request,3) IN ('jpg', 'gif', 'png', 'svg') ";
     } 
-    elsif (substr($filterurl,0,1) == 2) {
+    elsif (substr($filter,0,1) == 2) {
         $option .= " and RIGHT(request,4) <> 'jpeg' OR RIGHT(request,3) NOT IN ('jpg', 'gif', 'png','svg') ";
     } 
 
     # filter on bots
-    if (substr($filterurl,1,1)==1) { 
+    if (substr($filter,1,1)==1) { 
         $option .= " and bots.ip is null"; 
     }
-    elsif (substr($filterurl,1,1)==2){
+    elsif (substr($filter,1,1)==2){
         $option .= " and bots.ip is not null"; 
     }
   
     # filter on status code
-    if (int(substr($filterurl,2,3)) > 0){ 
-        $option .= ' and status = '.substr($filterurl,2,3).' '; 
+    if (int(substr($filter,2,3)) > 0){ 
+        $option .= ' and status = '.substr($filter,2,3).' '; 
     }
  
     my  $qry = "SELECT count(*) as numrows FROM access_log a LEFT JOIN bots on a.ip = bots.ip 
@@ -561,7 +561,7 @@ sub delete_domains
 sub errorlogs 
 {
   my $domain      = shift // 'domain';
-  my $filterurl   = shift // '000';
+  my $filter   = shift // '000';
   my $pageno      = shift // 1; 
   
   my $option      = '';
@@ -569,26 +569,26 @@ sub errorlogs
 
     return @array unless ($domain ne 'domain');
     # filter on images
-    if (substr($filterurl,0,1) == 1) { 
+    if (substr($filter,0,1) == 1) { 
         $option .= " and request like '%images%' ";
     } 
-    elsif (substr($filterurl,0,1) == 2) {
+    elsif (substr($filter,0,1) == 2) {
         $option .= " and request not like '%images%' ";
     } 
 
     # filer on bots
-    if (substr($filterurl,1,1)==1) { 
+    if (substr($filter,1,1)==1) { 
         $option .= " and bots.ip is null"; 
     }
-    elsif (substr($filterurl,1,1)==2){
+    elsif (substr($filter,1,1)==2){
         $option .= " and bots.ip is not null"; 
     }
   
     # filter on status
-    if (substr($filterurl,2,1)==1){ 
+    if (substr($filter,2,1)==1){ 
         $option .= " and status like 'error' "; 
     }
-    elsif (substr($filterurl,2,1)==2){ 
+    elsif (substr($filter,2,1)==2){ 
         $option .= " and status like 'crit' "; 
     }
  
@@ -603,33 +603,33 @@ sub errorlogs
 
 sub numrows_errorlogs 
 {
-    my $domain      = shift // 'domain';
-    my $filterurl   = shift // '000';
-    my $option      = '';
+    my $domain   = shift // 'domain';
+    my $filter   = shift // '000';
+    my $option   = '';
     
     return 0 unless ($domain ne 'domain');
 
     # filter on images
-    if (substr($filterurl,0,1) == 1) { 
+    if (substr($filter,0,1) == 1) { 
         $option .= " and request like '%images%' ";
     } 
-    elsif (substr($filterurl,0,1) == 2) {
+    elsif (substr($filter,0,1) == 2) {
         $option .= " and request not like '%images%' ";
     } 
 
     # filer on bots
-    if (substr($filterurl,1,1)==1) { 
+    if (substr($filter,1,1)==1) { 
         $option .= " and bots.ip is null"; 
     }
-    elsif (substr($filterurl,1,1)==2){
+    elsif (substr($filter,1,1)==2){
         $option .= " and bots.ip is not null"; 
     }
   
     # filter on status
-    if (substr($filterurl,2,1)==1){ 
+    if (substr($filter,2,1)==1){ 
         $option .= " and status like 'error' "; 
     }
-    elsif (substr($filterurl,2,1)==2){ 
+    elsif (substr($filter,2,1)==2){ 
         $option .= " and status like 'crit' "; 
     }
  
