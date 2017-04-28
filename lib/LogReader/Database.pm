@@ -145,12 +145,11 @@ sub accesslogs
     return @array unless ($domain ne 'domain');
     # filter on images
     if (substr($filter,0,1) == 1) { 
-        $option .= " and RIGHT(request,4) = 'jpeg' OR RIGHT(request,3) IN ('jpg', 'gif', 'png', 'svg') ";
+        $option .= " and SUBSTR(request,-4) = 'jpeg' OR SUBSTR(request,-3) IN ('jpg', 'gif', 'png', 'svg') ";
     } 
     elsif (substr($filter,0,1) == 2) {
-        $option .= " and RIGHT(request,4) <> 'jpeg' OR RIGHT(request,3) NOT IN ('jpg', 'gif', 'png','svg') ";
+        $option .= " and SUBSTR(request,-4) <> 'jpeg' OR SUBSTR(request,-3) NOT IN ('jpg', 'gif', 'png','svg') ";
     } 
-
     # filter on bots
     if (substr($filter,1,1)==1) { 
         $option .= " and bots.ip is null"; 
@@ -158,7 +157,6 @@ sub accesslogs
     elsif (substr($filter,1,1)==2){
         $option .= " and bots.ip is not null"; 
     }
-  
     # filter on status code
     if (int(substr($filter,2,3)) > 0){ 
         $option .= ' and status = '.substr($filter,2,3).' '; 
@@ -184,12 +182,11 @@ sub numrows_accesslogs
 
     # filter on images
     if (substr($filter,0,1) == 1) { 
-        $option .= " and RIGHT(request,4) = 'jpeg' OR RIGHT(request,3) IN ('jpg', 'gif', 'png', 'svg') ";
+        $option .= " and SUBSTR(request,-4) = 'jpeg' OR SUBSTR(request,-3) IN ('jpg', 'gif', 'png', 'svg') ";
     } 
     elsif (substr($filter,0,1) == 2) {
-        $option .= " and RIGHT(request,4) <> 'jpeg' OR RIGHT(request,3) NOT IN ('jpg', 'gif', 'png','svg') ";
+        $option .= " and SUBSTR(request,-4) <> 'jpeg' OR SUBSTR(request,-3) NOT IN ('jpg', 'gif', 'png','svg') ";
     } 
-
     # filter on bots
     if (substr($filter,1,1)==1) { 
         $option .= " and bots.ip is null"; 
@@ -197,7 +194,6 @@ sub numrows_accesslogs
     elsif (substr($filter,1,1)==2){
         $option .= " and bots.ip is not null"; 
     }
-  
     # filter on status code
     if (int(substr($filter,2,3)) > 0){ 
         $option .= ' and status = '.substr($filter,2,3).' '; 
