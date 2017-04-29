@@ -34,13 +34,14 @@ get '/' => sub
 	my $ua 		= LWP::UserAgent->new( ssl_opts => { verify_hostname => 0 } );
 	my $size    = scalar @domains;
 
-	for (my $i = 0; $i < $size; $i++) {
+	for (my $i = 0; $i < $size; $i++) 
+	{
 		debug $i;
 		if (length $domains[0][$i]->{fqdn})
 		{	
 			debug $domains[0][$i]->{fqdn};
 			my $response = $ua->head($domains[0][$i]->{fqdn});
-			debug $response;
+			debug $response->is_success;
 			$domains[0][$i]->{up} = ( $response->is_success ) ? 1 : 0; 
 	    }
     }
