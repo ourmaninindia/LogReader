@@ -343,16 +343,16 @@ debug to_dumper(@ids);
         SELECT request FROM error_log WHERE domain like ? and id = ?
       )/;
     my $sth = database('sqlserver')->prepare($qry);
-
+debug $qry;
     if ( ref($ids[0]) ne 'ARRAY') {
         $sth->execute($domain,$domain,@ids) or die "Unable to update @ids";
     }
     else {
-      debug $ids[0];
+      debug $ids[0][0];
         while ($ids[$i] > 0 ) 
         {
-          debug $ids[$i];
-            eval { $sth->execute($domain,$domain,$ids[$i]) or die 'Unable to update. id: '.$ids[$i]; };
+          debug $ids[0][$i];
+            eval { $sth->execute($domain,$domain,$ids[0][$i]) or die 'Unable to update. id: '.$ids[0][$i]; };
 
             if($@) { 
                 $error = 1;
