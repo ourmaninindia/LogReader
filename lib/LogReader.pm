@@ -32,8 +32,8 @@ get '/' => sub
 	my @domains = domains();
 	my $i 		= 0;
 	my $ua 		= LWP::UserAgent->new( ssl_opts => { verify_hostname => 0 } );
-	my $size    = scalar @domains;
-
+	my $size    = scalar @domains[0];
+debug $size;
 	for (my $i = 0; $i < $size; $i++) 
 	{
 		debug $i;
