@@ -16,7 +16,7 @@ use LWP::Protocol::https;
 
 use open qw(:std :utf8);
 
-our $VERSION 		 = '0.1';  
+our $VERSION 		 = '0.1';
 our $NGINX_ERROR_LOG = '/var/log/nginx';
 our $ROWS_PER_PAGE   = 15;
 
@@ -33,18 +33,14 @@ get '/' => sub
 	my $i 		= 0;
 	my $ua 		= LWP::UserAgent->new( ssl_opts => { verify_hostname => 0 } );
 
-	while ($domains[0][$i]){
+	while ( length( $domains[0][$i]->{fqdn} ) ) {
 		
-		my $url=$domains[0][$i]->{fqdn};
-debug "XXXX $i=$url";
 		$domains[0][$i]->{up} = 0; 
+debug "XXXX $i domain=$domains[0][$i]->{fqdn}";
+		my $response = $ua->head( $domains[0][$i]->{fqdn} );
 
-		if ( defined($url)>0 ) {
-			my $response = $ua->head($url);
-			debug to_dumper($response);
-			if ( $response->is_success ) {
-				$domains[0][$i]->{up} = 1; 
-			}
+		if ( $response->is_success ) {
+			$domains[0][$i]->{up} = 1; 
 		}
 		$i += 1;
     }
