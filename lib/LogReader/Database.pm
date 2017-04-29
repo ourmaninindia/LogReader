@@ -488,7 +488,7 @@ sub domains
 {
     return database('sqlserver')->selectall_arrayref
       ( 
-        "SELECT * FROM domains d LEFT JOIN clients c ON d.clients_id=c.clients_id 
+        "SELECT count(*) as numrows, * FROM domains d LEFT JOIN clients c ON d.clients_id=c.clients_id 
         ORDER BY client,domain", { Slice => {} } 
       );
 }
