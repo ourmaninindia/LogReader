@@ -40,7 +40,7 @@ get '/' => sub
 		my $response = $ua->head($domains[0][$i]->{fqdn});
 
 		$domains[0][$i]->{up} = ( $response->is_success ) ? 1 : 0; 
-    }
+    };
     template dashboard =>  {
     	domains => @domains,
     };
@@ -173,7 +173,7 @@ post '/clients/:option' => sub
 get '/domains' => sub 
 {
 	my @dirs=();
-	opendir(DIR, $NGINX_ERROR_LOG) or die "Can't opendir $NGINX_ERROR_LOG: $!";
+	opendir(DIR, $NGINX_ERROR_LOG) or $alert->{message}= "Can't opendir $NGINX_ERROR_LOG: $!";
  
     while (my $folder = readdir(DIR)) 
     {
@@ -193,6 +193,7 @@ get '/domains' => sub
         clients     => clients(),
         name        => params->{name},
         dirs		=> \@dirs,
+        alert       => $alert,
     };
 };
 
