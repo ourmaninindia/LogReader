@@ -354,12 +354,8 @@ sub update_accesslogs
         $sth->finish;
     }
     else {
-        debug to_dumper(@ids);
-        debug $ids[0][$i];
-      
         while ($ids[0][$i] > 0 ) 
         {
-          debug $ids[0][$i];
             eval { $sth->execute($domain,$ids[0][$i]); };
 
             if($@) { 
