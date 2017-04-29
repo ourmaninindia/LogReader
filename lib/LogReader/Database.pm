@@ -352,7 +352,7 @@ debug $qry;
         while ($ids[$i] > 0 ) 
         {
           debug $ids[0][$i];
-            eval { $sth->execute($domain,$domain,$ids[0][$i]) or die 'Unable to update. id: '.$ids[0][$i]; };
+            eval { $sth->execute($domain,$domain,$ids[0][$i]); };
 
             if($@) { 
                 $error = 1;
