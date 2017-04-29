@@ -337,21 +337,19 @@ sub update_accesslogs
        $alert->{type}    = 'Info';
        $alert->{message} = "Deleted the entry";   
     my $i       = 0;
-debug to_dumper(@ids);      
+      
     my $qry = q/DELETE FROM access_log WHERE domain like ? and request = 
       (
-        SELECT request FROM error_log WHERE domain like ? and id = ?
+        SELECT request FROM access_log WHERE id = ?
       )/;
     my $sth = database('sqlserver')->prepare($qry);
-debug $qry;
+
     if ( ref($ids[0]) ne 'ARRAY') {
-        $sth->execute($domain,$domain,@ids) or die "Unable to update @ids";
+        $sth->execute($domain,@ids) or die "Unable to update @ids";
     }
     else {
-      debug $ids[0][0];
         while ($ids[$i] > 0 ) 
         {
-          debug $ids[0][$i];
             eval { $sth->execute($domain,$domain,$ids[0][$i]); };
 
             if($@) { 
