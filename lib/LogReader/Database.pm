@@ -248,21 +248,17 @@ sub insert_accesslogs
 
   # initialise variables
   my @data;
-  my $alert;
-  my $fh;
-  my $ph;
+  my $alert = 'success Log data inserted into the database';  
   my $counter       = 0;
-  my $progress      = 0;
-  my $progress_last = 0;
 
   # determine the last date entered
-  my  $lastdate = database('sqlserver')->selectrow_array("SELECT max(date) as lastdate FROM access_log WHERE domain like '%$domain%';");
+  my  $lastdate = database('sqlserver')->selectrow_array("SELECT max(date) as lastdate 
+      FROM access_log WHERE domain like '%$domain%';");
       $lastdate = $lastdate // 0;
 
     # obtain the files handler
     unless (open (FH, '<:encoding(UTF-8)', $LogReader::NGINX_ERROR_LOG."/$domain/access.log")) {
-        $alert->{type}    = 'warning';
-        $alert->{message} = "Cannot open log file ".$LogReader::NGINX_ERROR_LOG."/$domain/access.log: $!";
+        $alert = "warning Cannot open log file ".$LogReader::NGINX_ERROR_LOG."/$domain/access.log: $!";
         return $alert;
     }
 
@@ -313,16 +309,13 @@ sub insert_accesslogs
         }
 
         $sth->execute("$date","$status","$ua","$ip","$host","$request","$method","$protocol","$domain",$size) 
-            or die 'Unable to insert.';
+            or $alert = 'danger Unable to insert.';
         $sth->finish;
     };
     close FH;
 
     LogReader::session( 'progress' => 100 );
     $application->session_engine->flush( session => $my_session );
-
-    $alert->{type}    = 'success';
-    $alert->{message} = 'Log data inserted into the database';
 
     return $alert;
 }
@@ -333,9 +326,7 @@ sub update_accesslogs
     my @ids     = shift;
     my $domain  = shift;
     my $error   = 0;
-    my $alert;
-       $alert->{type}    = 'Info';
-       $alert->{message} = "Deleted the entry";   
+    my $alert   = 'Info Deleted the entry';   
     my $i       = 0;
       
     my $qry = q/DELETE FROM access_log WHERE domain like ? and request like 
@@ -348,8 +339,7 @@ sub update_accesslogs
         eval { $sth->execute($domain,@ids); };
 
         if($@) { 
-          $alert->{type}    = 'warning';
-          $alert->{message} = "Unable to update an entry: $qry";
+          $alert = "warning Unable to update an entry: $qry";
         }
         $sth->finish;
     }
@@ -359,8 +349,7 @@ sub update_accesslogs
             eval { $sth->execute($domain,$ids[0][$i]); };
 
             if($@) { 
-              $alert->{type}    = 'warning';
-              $alert->{message} = "Unable to update an entry: $qry";
+              $alert = "warning Unable to update an entry: $qry";
             }
             $sth->finish;
             $i += 1;
@@ -664,9 +653,7 @@ sub insert_errorlogs
 
   # initialise variables
   my @data;
-  my $alert;
-  my $fh;
-  my $ph;
+  my $alert = 'success Log data inserted into the database';
   my $counter       = 0;
   my $progress      = 0;
   my $progress_last = 0;
@@ -677,8 +664,7 @@ sub insert_errorlogs
 
   # obtain the files handler
   unless (open (FH, '<:encoding(UTF-8)', $LogReader::NGINX_ERROR_LOG."/$domain/error.log")) {
-    $alert->{type}    = 'warning';
-    $alert->{message} = "Cannot open log file ".$LogReader::NGINX_ERROR_LOG."/$domain/error.log: $!";
+    $alert = "warning Cannot open log file ".$LogReader::NGINX_ERROR_LOG."/$domain/error.log: $!";
     return $alert;
   }
 
@@ -759,16 +745,13 @@ sub insert_errorlogs
         next if (index($request,'.well-known') > -1); # a known PHP google bot
         
         $sth->execute("$date","$status","$client","$server","$request","$method","$host","$error","$domain") 
-            or die "Unable to insert.";
+            or $alert = "danger Unable to insert.";
         $sth->finish;
   };
   close FH;
 
   LogReader::session( 'progress' => 100 );
   $application->session_engine->flush( session => $my_session );
-
-  $alert->{type}    = 'success';
-  $alert->{message} = 'Log data inserted into the database';
 
   return $alert;
 }
@@ -777,7 +760,6 @@ sub update_errorlogs
 {
     my @ids     = shift;
     my $domain  = shift;
-    my $error   = 0;
     my $alert;
     my $i       = 0;
       
@@ -788,7 +770,7 @@ sub update_errorlogs
         eval { $sth->execute($domain,$domain,@ids) or die "Unable to update. id: @ids";};
 
         if($@) { 
-            $error = 1;
+            $alert = "warning Unable to update an entry: $qry";
         }
         $sth->finish;
     }
@@ -798,17 +780,12 @@ sub update_errorlogs
             eval { $sth->execute($domain,$domain,$ids[0][$i]) or die 'Unable to update. id: '.$ids[0][$i]; };
 
             if($@) { 
-                $error = 1;
+                $alert = "warning Unable to update an entry: $qry";
             }
             $sth->finish;
             $i += 1;
         } 
     }
-    if ($error){
-        $alert->{type}    = 'warning';
-        $alert->{message} = "Unable to update an entry: $qry";
-    }    
-
     return $alert;
 }
 
@@ -821,11 +798,10 @@ sub delete_errorlogs
 
     my  $qry = 'DELETE FROM error_log where domain like ? and date < ?';
     my  $sth = database('sqlserver')->prepare($qry);
-        $sth->execute($domain,$date) or $alert->message="Unable to delete. ";
+        $sth->execute($domain,$date) or $alert = "danger Unable to delete. ";
         $sth->finish;
     
-    $alert->{type}    = 'success';
-    $alert->{message} = "Log data up to $eudate has been deleted from the database.";
+    $alert = "success Log data up to $eudate has been deleted from the database.";
 
     return $alert;
 }

@@ -67,10 +67,7 @@
 
     <h3>Clients</h3>
     
-    [% IF alert.type == "success" %]<div class = "alert alert-success">[% alert.message %]</div>[% END %]
-    [% IF alert.type == "info"    %]<div class = "alert alert-info"   >[% alert.message %]</div>[% END %]
-    [% IF alert.type == "warning" %]<div class = "alert alert-warning">[% alert.message %]</div>[% END %]
-    [% IF alert.type == "danger"  %]<div class = "alert alert-danger" >[% alert.message %]</div>[% END %]
+    [% INCLUDE layouts/alert.tt %]
     
     <div class="row">
         <div class="col-md-8">

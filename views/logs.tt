@@ -52,14 +52,8 @@
             </div>
         </div>
     </div>
- <h3>Log Types</h3>
-    
-    [% IF alert.type == "success" %]<div class = "alert alert-success">[% alert.message %]</div>[% END %]
-    [% IF alert.type == "info"    %]<div class = "alert alert-info"   >[% alert.message %]</div>[% END %]
-    [% IF alert.type == "warning" %]<div class = "alert alert-warning">[% alert.message %]</div>[% END %]
-    [% IF alert.type == "danger"  %]<div class = "alert alert-danger" >[% alert.message %]</div>[% END %]
-    
-    
+    <h3>Log Types</h3>
+    [% INCLUDE layouts/alert.tt %]
         <div><br></div>
         <div class="row">
             <div class="col-md-6">

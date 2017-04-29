@@ -1,0 +1,4 @@
+ [% IF substr(alert,0,7) == "success" %]<div class = "alert alert-success">[% substr(alert,9) %]</div>[% END %]
+ [% IF substr(alert,0,4) == "info"    %]<div class = "alert alert-info"   >[% substr(alert,6) %]</div>[% END %]
+ [% IF substr(alert,0,7) == "warning" %]<div class = "alert alert-warning">[% substr(alert,9) %]</div>[% END %]
+ [% IF substr(alert,0,6) == "danger"  %]<div class = "alert alert-danger" >[% substr(alert,8) %]</div>[% END %]

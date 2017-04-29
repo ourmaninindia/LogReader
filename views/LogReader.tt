@@ -73,12 +73,10 @@
         </div>
     </div>
 </div>
- <h3>Error Log</h3>
+<h3>Error Log</h3>
 
-[% IF alert.type == "success" %]<div class = "alert alert-success">[% alert.message %]</div>[% END %]
-[% IF alert.type == "info"    %]<div class = "alert alert-info"   >[% alert.message %]</div>[% END %]
-[% IF alert.type == "warning" %]<div class = "alert alert-warning">[% alert.message %]</div>[% END %]
-[% IF alert.type == "danger"  %]<div class = "alert alert-danger" >[% alert.message %]</div>[% END %]
+[% INCLUDE layouts/alert.tt %]
+
 <!-- data columns -->
 <div class="row">
     <div class="col-md-2">
