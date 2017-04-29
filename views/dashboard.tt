@@ -48,7 +48,9 @@
                     [% FOREACH dom in domains -%]
                     <div class="col-md-3  domains">
                         <div>
-                            <a href="http://log.traveljadoo.com/[% dom.domain %]"><img src="../images/[% dom.image_url %]" alt="home page"></a>
+                            <a href="http://log.traveljadoo.com/error/[% dom.domain %]/000/1">
+                                <img src="../images/[% dom.image_url %]" alt="home page">
+                            </a>
                         </div>
                         <div>
                             <a href="[% dom.fqdn %]" target="_blank">[% dom.domain %]</a>
