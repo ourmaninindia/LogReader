@@ -338,7 +338,7 @@ sub update_accesslogs
        $alert->{message} = "Deleted the entry";   
     my $i       = 0;
       
-    my $qry = q/DELETE FROM access_log WHERE domain like ? and request = 
+    my $qry = q/DELETE FROM access_log WHERE domain like ? and request like 
       (
         SELECT request FROM access_log WHERE id = ?
       )/;
