@@ -348,8 +348,10 @@ debug to_dumper(@ids);
         $sth->execute($domain,$domain,@ids) or die "Unable to update @ids";
     }
     else {
+      debug $ids[0];
         while ($ids[$i] > 0 ) 
         {
+          debug $ids[$i];
             eval { $sth->execute($domain,$domain,$ids[$i]) or die 'Unable to update. id: '.$ids[$i]; };
 
             if($@) { 
