@@ -35,10 +35,12 @@ get '/' => sub
 	my $size    = scalar @domains;
 
 	for (my $i = 0; $i < $size; $i++) {
+		debug $i;
 		if (length $domains[0][$i]->{fqdn})
 		{	
+			debug $domains[0][$i]->{fqdn};
 			my $response = $ua->head($domains[0][$i]->{fqdn});
-
+			debug $response;
 			$domains[0][$i]->{up} = ( $response->is_success ) ? 1 : 0; 
 	    }
     }
