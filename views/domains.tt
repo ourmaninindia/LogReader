@@ -81,10 +81,10 @@
 
     <h3>Domains</h3>
     
-    [% IF alert.type == "success" %]<div class = "alert alert-success">[% alert.message %]</div>[% END %]
-    [% IF alert.type == "info"    %]<div class = "alert alert-info"   >[% alert.message %]</div>[% END %]
-    [% IF alert.type == "warning" %]<div class = "alert alert-warning">[% alert.message %]</div>[% END %]
-    [% IF alert.type == "danger"  %]<div class = "alert alert-danger" >[% alert.message %]</div>[% END %]
+    [% IF substr(alert,0,7) == "success" %]<div class = "alert alert-success">[% substr(alert,9) %]</div>[% END %]
+    [% IF substr(alert,0,4) == "info"    %]<div class = "alert alert-info"   >[% substr(alert,6) %]</div>[% END %]
+    [% IF substr(alert,0,7) == "warning" %]<div class = "alert alert-warning">[% substr(alert,9) %]</div>[% END %]
+    [% IF substr(alert,0,6) == "danger"  %]<div class = "alert alert-danger" >[% substr(alert,8) %]</div>[% END %]
     
     <div class="row">
         <div class="col-md-10">

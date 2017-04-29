@@ -177,13 +177,9 @@ get '/domains' => sub
 	my @dirs=();
 	my $alert;
 
-	opendir(DIR, $NGINX_ERROR_LOG) or 
-	{
-		$alert->{type}		= 'danger';
-		$alert->{message}	= "Can't opendir $NGINX_ERROR_LOG: $!";
- 	}
+	opendir(my $handle, $NGINX_ERROR_LOG) or $alert = "danger: Can't opendir $NGINX_ERROR_LOG: $!";
 
-    while (my $folder = readdir(DIR)) 
+    while (my $folder = readdir($handle)) 
     {
 	    next if ($folder =~ /^..?$/);  # skip . and ..
 	    my $path = $NGINX_ERROR_LOG . '/' . $folder;
@@ -191,7 +187,7 @@ get '/domains' => sub
 	    push @dirs, $folder;
     }
 
-    closedir(DIR);
+    closedir($handle);
 
     @dirs = sort @dirs;
 
