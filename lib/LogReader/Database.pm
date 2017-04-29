@@ -488,7 +488,7 @@ sub domains
 {
     return database('sqlserver')->selectall_arrayref
       ( 
-        "SELECT count(*) as numrows, * FROM domains d LEFT JOIN clients c ON d.clients_id=c.clients_id 
+        "SELECT * FROM domains d LEFT JOIN clients c ON d.clients_id=c.clients_id 
         ORDER BY client,domain", { Slice => {} } 
       );
 }
@@ -501,7 +501,7 @@ sub insert_domains
     my $image_url  = shift ;
     my $clients_id = shift // 0;
 
-    $image_url = 'placeholder.png' unless (len($image_url) > 0);
+    $image_url = 'placeholder.png' unless (length($image_url) > 0);
 
     return 0 unless (length($domain) != 0 );
 
