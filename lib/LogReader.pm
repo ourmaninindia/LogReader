@@ -35,12 +35,14 @@ get '/' => sub
 	my $size    = scalar @domains;
 
 	for (my $i = 0; $i < $size; $i++) {
-	if ($domains[0][$i]->{fqdn})
-	{	
-		my $response = $ua->head($domains[0][$i]->{fqdn});
+		if ($domains[0][$i]->{fqdn})
+		{	
+			my $response = $ua->head($domains[0][$i]->{fqdn});
 
-		$domains[0][$i]->{up} = ( $response->is_success ) ? 1 : 0; 
-    };
+			$domains[0][$i]->{up} = ( $response->is_success ) ? 1 : 0; 
+	    }
+    }
+
     template dashboard =>  {
     	domains => @domains,
     };
@@ -173,8 +175,14 @@ post '/clients/:option' => sub
 get '/domains' => sub 
 {
 	my @dirs=();
-	opendir(DIR, $NGINX_ERROR_LOG) or $alert->{message}= "Can't opendir $NGINX_ERROR_LOG: $!";
- 
+	my $alert;
+
+	opendir(DIR, $NGINX_ERROR_LOG) or 
+	{
+		$alert->{type}		= 'danger';
+		$alert->{message}	= "Can't opendir $NGINX_ERROR_LOG: $!";
+ 	}
+
     while (my $folder = readdir(DIR)) 
     {
 	    next if ($folder =~ /^..?$/);  # skip . and ..
