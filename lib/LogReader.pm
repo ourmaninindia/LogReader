@@ -16,7 +16,7 @@ use LWP::Protocol::https;
 
 use open qw(:std :utf8);
 
-our $VERSION 		 = '0.1';
+our $VERSION 		 = '0.1';  
 our $NGINX_ERROR_LOG = '/var/log/nginx';
 our $ROWS_PER_PAGE   = 15;
 
@@ -36,17 +36,17 @@ get '/' => sub
 	while ($domains[0][$i]){
 		
 		my $url=$domains[0][$i]->{fqdn};
-debug "$i=$url";
+debug "XXXX $i=$url";
 		$domains[0][$i]->{up} = 0; 
 
 		if ( defined($url)>0 ) {
 			my $response = $ua->head($url);
-		debug to_dumper($response);
+			debug to_dumper($response);
 			if ( $response->is_success ) {
 				$domains[0][$i]->{up} = 1; 
 			}
 		}
-		$i++;
+		$i += 1;
     }
     template dashboard =>  {
     	domains     => @domains,
