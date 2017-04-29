@@ -345,25 +345,31 @@ sub update_accesslogs
     my $sth = database('sqlserver')->prepare($qry);
 
     if ( ref($ids[0]) ne 'ARRAY') {
-        $sth->execute($domain,@ids) or die "Unable to update @ids";
+        eval { $sth->execute($domain,@ids); };
+
+        if($@) { 
+          $alert->{type}    = 'warning';
+          $alert->{message} = "Unable to update an entry: $qry";
+        }
+        $sth->finish;
     }
     else {
-        while ($ids[$i] > 0 ) 
+        debug to_dumper(@ids);
+        debug $ids[0][$i];
+      
+        while ($ids[0][$i] > 0 ) 
         {
+          debug $ids[0][$i];
             eval { $sth->execute($domain,$ids[0][$i]); };
 
             if($@) { 
-                $error = 1;
+              $alert->{type}    = 'warning';
+              $alert->{message} = "Unable to update an entry: $qry";
             }
             $sth->finish;
             $i += 1;
         } 
-    }
-    if ($error){
-        $alert->{type}    = 'warning';
-        $alert->{message} = "Unable to update an entry: $qry";
     }    
-
     return $alert;
 }
 
