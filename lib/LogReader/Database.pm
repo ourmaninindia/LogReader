@@ -211,7 +211,7 @@ sub numrows_accesslogs
     $sth->execute($domain);
     my $row = $sth->fetchrow_hashref('NAME_lc');
     $sth->finish;
-debug to_dumper($row);
+
     return $row->{numrows};
 }
 
@@ -337,7 +337,7 @@ sub update_accesslogs
        $alert->{type}    = 'Info';
        $alert->{message} = "Deleted the entry";   
     my $i       = 0;
-      
+debug to_dumper(@ids);      
     my $qry = q/DELETE FROM access_log WHERE domain like ? and request = 
       (
         SELECT request FROM error_log WHERE domain like ? and id = ?
