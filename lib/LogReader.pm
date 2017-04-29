@@ -33,7 +33,6 @@ get '/' => sub
 	my $i 		= 0;
 	my $ua 		= LWP::UserAgent->new( ssl_opts => { verify_hostname => 0 } );
 
-debug to_dumper(@domains);
 	while ($domains[0][$i]){
 		
 		my $url=$domains[0][$i]->{fqdn};
