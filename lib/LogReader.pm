@@ -36,12 +36,12 @@ get '/' => sub
 	while ($domains[0][$i]){
 		
 		my $url=$domains[0][$i]->{fqdn};
-debug $url;
+debug "$i=$url";
 		$domains[0][$i]->{up} = 0; 
 
 		if ( defined($url)>0 ) {
 			my $response = $ua->head($url);
-debug to_dumper($response);
+		debug to_dumper($response);
 			if ( $response->is_success ) {
 				$domains[0][$i]->{up} = 1; 
 			}
