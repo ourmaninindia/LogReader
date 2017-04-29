@@ -33,23 +33,20 @@ get '/' => sub
 	my $i 		= 0;
 	my $ua 		= LWP::UserAgent->new( ssl_opts => { verify_hostname => 0 } );
 
-	while ($domains[0][$i]){
+	while ($domains[0][$i]->{fqdn}){
 		
-		my $url=$domains[0][$i]->{fqdn};
-
 		$domains[0][$i]->{up} = 0; 
 
-		if ( defined($url)>0 ) {
-			my $response = $ua->head($url);
+		my $response = $ua->head($domains[0][$i]->{fqdn});
 
-			if ( $response->is_success ) {
-				$domains[0][$i]->{up} = 1; 
-			}
+		if ( $response->is_success ) {
+			$domains[0][$i]->{up} = 1; 
 		}
+		
 		$i++;
     }
     template dashboard =>  {
-    	domains     => @domains,
+    	domains => @domains,
     };
 };
 
