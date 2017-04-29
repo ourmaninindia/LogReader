@@ -38,8 +38,10 @@ get '/' => sub
 
 	for (my $i = 0; $i < $size; $i++) 
 	{
-		next if $domains[0][$i]->{domain} == "LogReader";
-		if (length $domains[0][$i]->{fqdn})
+		if ($domains[0][$i]->{domain} eq 'LogReader') {
+			$domains[0][$i]->{up} = 1;
+		} 
+		elsif (length $domains[0][$i]->{fqdn})
 		{	
 			my $response = $ua->head($domains[0][$i]->{fqdn});
 			$domains[0][$i]->{up} = ( $response->is_success ) ? 1 : 0; 
